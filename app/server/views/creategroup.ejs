@@ -1,0 +1,48 @@
+<html lang="en">
+    <head>
+        <link rel="stylesheet" href="/styles/styles.css" />
+        <title>Album Collector</title>
+    </head>
+    <body>
+        <span class="subpage-title">Create Group</span>
+        <br>
+        <form id="createGroupForm">
+            <label for="gname">Group name:</label>
+            <input type="text" id="gname">
+            <br><br>
+            <input type="submit" value="Create">
+        </form>
+        <script>
+            document.getElementById("createGroupForm").addEventListener("submit", function (e) {
+                e.preventDefault(); // stops the form from reloading the page
+
+                const groupName = document.getElementById("gname").value.trim();
+
+                if (!groupName) {
+                    alert("Please enter a group name.");
+                    return;
+                } else if (groupName.length > 100) {
+                    alert("Group names cannot exceed 100 characters.");
+                    return;
+                }
+
+                fetch("/api/groups/create", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name: groupName })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                        return;
+                    }
+                    console.log("Group created!", data);
+                })
+                .catch(err => {
+                    console.error("Error:", err);
+                });
+            });
+        </script>
+    </body>
+</html>

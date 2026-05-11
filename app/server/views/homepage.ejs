@@ -1,0 +1,29 @@
+<html lang="en">
+    <head>
+        <link rel="stylesheet" href="/styles/styles.css" />
+        <title>Album Collector</title>
+    </head>
+    <body>
+        <span class="home-title">Album Collector</span>
+        <br>
+        <button id="collectionButton" type="button" class="home-button home-collection">My Collection</button>
+        <br>
+        <button id="joinGroupButton" type="button" class="home-button home-joingroup">Join Group</button>
+        <br>
+        <button id="createGroupButton" type="button" class="home-button home-creategroup">Create Group</button>
+        <br>
+        <script>
+            document.getElementById("collectionButton").addEventListener("click", function () {
+                window.location.href = "/collection";
+            });
+            document.getElementById("joinGroupButton").addEventListener("click", function () {
+                window.location.href = "/join";
+            });
+            document.getElementById("createGroupButton").addEventListener("click", function () {
+                window.location.href = "/creategroup";
+            });
+        </script>
+        <!-- TODO: Add Groups element, pulling available groups -->
+        <span class="subtitle">Groups</span>
+    </body>
+</html>

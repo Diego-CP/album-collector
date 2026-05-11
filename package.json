@@ -1,20 +1,22 @@
 {
-  "name": "sample-node-project",
+  "name": "album-collector",
   "version": "1.0.0",
-  "description": "Sample Node.js Project",
+  "description": "Application to facilitate the trading of album stickers.",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
     "test": "jest --watch"
   },
-  "author": "Adem Cemil YALCIN",
-  "license": "ISC",
+  "author": "Diego Corrales Pinedo",
+  "private": true,
+  "license": "UNLICENSED",
   "dependencies": {
-    "ejs": "^3.1.10",
-    "express": "^5.1.0"
+    "dotenv": "^17.4.2",
+    "ejs": "^5.0.2",
+    "express": "^5.2.1"
   },
   "devDependencies": {
-    "jest": "^30.2.0",
-    "supertest": "^7.1.4"
+    "jest": "^30.3.0",
+    "supertest": "^7.2.2"
   }
 }

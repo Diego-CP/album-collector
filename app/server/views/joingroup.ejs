@@ -1,0 +1,48 @@
+<html lang="en">
+    <head>
+        <link rel="stylesheet" href="/styles/styles.css" />
+        <title>Album Collector</title>
+    </head>
+    <body>
+        <span class="subpage-title">Join Group</span>
+        <br>
+        <form id="joinGroupForm">
+            <label for="gcode">Group code:</label>
+            <input type="text" id="gcode">
+            <br><br>
+            <input type="submit" value="Search & Join">
+        </form>
+        <script>
+            document.getElementById("joinGroupForm").addEventListener("submit", function (e) {
+                e.preventDefault(); // stops the form from reloading the page
+
+                const groupCode = document.getElementById("gcode").value.trim();
+
+                if (!groupCode) {
+                    alert("Please enter a group code.");
+                    return;
+                } else if (groupCode.length > 10) {
+                    alert("Group codes cannot exceed 10 characters.");
+                    return;
+                }
+
+                fetch("/api/groups/join", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ code: groupCode })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                        return;
+                    }
+                    console.log("Group joined!", data);
+                })
+                .catch(err => {
+                    console.error("Error:", err);
+                });
+            });
+        </script>
+    </body>
+</html>

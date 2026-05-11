@@ -1,4 +1,58 @@
 /* Custom styles can be added to this file */
-span {
+
+/* Common styles across pages */
+.subpage-title {
+    font-size: 50px;
+    color: darkblue;
+}
+
+.subtitle {
+    font-size: 20px;
+}
+
+/* Sign In page styles */
+.signin-title {
     font-size: 50px;
 }
+
+.signin-button {
+    background-color: burlywood;
+}
+
+/* Home page styles */
+.home-title {
+    font-size: 80px;
+    color: red;
+}
+
+.home-button {
+    font-size: 10px;
+}
+
+.home-collection {
+    background-color: cyan;
+}
+
+.home-joingroup {
+    background-color: yellow;
+}
+
+.home-creategroup {
+    background-color: green;
+}
+
+/* Create Account page styles */
+.create-button {
+    background-color: pink;
+}
+
+/* Collection page styles */
+.collection-button {
+    background-color: lightgrey;
+}
+
+/* Edit Collection page styles */
+
+/* Join Group page styles */
+
+/* Create Group page styles */
