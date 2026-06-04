@@ -6,13 +6,12 @@
     <body>
         <span class="signin-title">Album Collector</span>
         <br>
-        <button id="signinButton" type="button" class="signin-button">Sign In</button>
+        <button id="signinButton" type="button" class="signin-button">Sign In or Create Account</button>
         <script>
             document.getElementById("signinButton").addEventListener("click", function () {
-                window.location.href = "/";
+                const redirect = encodeURIComponent("<%= cognitoRedirectUri %>");
+                window.location.href = `<%= cognitoDomain %>/login?client_id=<%= cognitoClientId %>&response_type=code&scope=email+openid+phone&redirect_uri=${redirect}&state=<%= state %>`;
             });
         </script>
-        <br>
-        <a href="/createaccount">Or, create an account</a>
     </body>
 </html>

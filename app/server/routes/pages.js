@@ -9,10 +9,6 @@ router.get('/createaccount', function(req, res){
     res.render('createaccount');
 });
 
-router.get('/signin', function(req, res){
-    res.render('signin'); 
-});
-
 router.get('/collection', function(req, res){
     res.render('collection'); 
 });
