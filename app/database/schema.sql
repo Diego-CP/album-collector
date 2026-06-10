@@ -24,7 +24,7 @@ CREATE TABLE user_groups (
 CREATE TABLE group_members (
   group_id BIGINT NOT NULL,
   user_id BIGINT NOT NULL,
-  role ENUM('owner', 'member') NOT NULL DEFAULT 'member',
+  role ENUM('admin', 'member') NOT NULL DEFAULT 'member',
 
   PRIMARY KEY (group_id, user_id),
 

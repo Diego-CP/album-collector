@@ -3,6 +3,16 @@ const authenticateToken = require('../../middleware/auth');
 const router = express.Router();
 router.use(authenticateToken);
 
+function generateRandomCode() {
+    var code = '';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < 7; i++ ) {
+        code += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return code;
+}
+
 router.post('/create', async function(req, res) {
     try {
         let { name } = req.body;
@@ -17,21 +27,32 @@ router.post('/create', async function(req, res) {
             'SELECT id FROM users WHERE cognito_sub = ?',
             [req.user.sub]
         );
+        
         const userId = rows[0].id;
 
         let result;
         let attempts = 0;
         const MAX_ATTEMPTS = 5;
+        const connection = await db.getConnection();
+        await connection.beginTransaction();
 
         while (attempts < MAX_ATTEMPTS) {
             try {
-                const inviteCode = generateRandomCode(); // TODO: Implement generate random code function
-                [result] = await db.execute(
+                const inviteCode = generateRandomCode();
+                [result] = await connection.execute(
                     "INSERT INTO user_groups (name, invite_code, created_by_user_id) VALUES (?, ?, ?)",
                     [name, inviteCode, userId]
                 );
+
+                await connection.execute(
+                    "INSERT INTO group_members (group_id, user_id, role) VALUES (?, ?, 'owner')",
+                    [result.insertId, userId]
+                );
+
+                await connection.commit();
                 break;
             } catch (err) {
+                await connection.rollback();
                 if (err.code === 'ER_DUP_ENTRY') {
                     attempts++;
                     if (attempts === MAX_ATTEMPTS) {
@@ -40,11 +61,12 @@ router.post('/create', async function(req, res) {
                 } else {
                     throw err;
                 }
+            } finally {
+                connection.release();
             }
         }
 
-        // TODO: result.insertId will return the ID of the group, so we could reroute to the group's page once it is created
-        res.json({ success: true, id: result.insertId });
+        res.redirect(`/group/admin/${result.insertId}`);
 
     } catch (err) {
         console.error(err);
