@@ -6,7 +6,7 @@
     <body>
         <span class="home-title">Album Collector</span>
         <br>
-        <span class="home-title">Welcome USERNAME</span>
+        <span class="home-title">Welcome <%= username %></span>
         <br>
         <button id="collectionButton" type="button" class="home-button home-collection">My Collection</button>
         <br>
@@ -14,6 +14,7 @@
         <br>
         <button id="createGroupButton" type="button" class="home-button home-creategroup">Create Group</button>
         <br>
+        <button id="logoutButton" type="button" class="home-button home-logout">Logout</button>
         <script>
             document.getElementById("collectionButton").addEventListener("click", function () {
                 window.location.href = "/collection";
@@ -23,6 +24,9 @@
             });
             document.getElementById("createGroupButton").addEventListener("click", function () {
                 window.location.href = "/creategroup";
+            });
+            document.getElementById("logoutButton").addEventListener("click", function () {
+                window.location.href = "/auth/logout";
             });
         </script>
         <!-- TODO: Add Groups element, pulling available groups -->

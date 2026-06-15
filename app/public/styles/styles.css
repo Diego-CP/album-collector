@@ -41,6 +41,10 @@
     background-color: green;
 }
 
+.home-logout {
+    background-color: red;
+}
+
 /* Create Account page styles */
 .create-button {
     background-color: pink;

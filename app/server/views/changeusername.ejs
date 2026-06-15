@@ -8,7 +8,7 @@
         <br>
         <form id="createUsername">
             <label for="uname">Enter a new username:</label>
-            <input type="text" id="uname">
+            <input type="text" id="uname" maxlength="20" minlength="2" required>
             <br><br>
             <input type="submit" value="Submit">
         </form>
@@ -21,8 +21,8 @@
                 if (!username) {
                     alert("Please enter a username.");
                     return;
-                } else if (username.length > 100) {
-                    alert("Usernames cannot exceed 100 characters.");
+                } else if (username.length > 20 || username.length < 2) {
+                    alert("Usernames must be between 2 and 20 characters.");
                     return;
                 }
 
@@ -37,13 +37,13 @@
                         alert(data.error);
                         return;
                     }
+
+                    window.location.href = "/";
                 })
                 .catch(err => {
                     console.error("Error:", err);
                 });
             });
-
-            window.location.href = "/";
         </script>
     </body>
 </html>

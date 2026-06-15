@@ -36,14 +36,18 @@ router.get('/callback', async function(req, res) {
 
         const { sub, email } = jwt.decode(id_token);
 
-        const [result] = await db.execute(
-            `INSERT INTO users (cognito_sub, email, display_name)
-            VALUES (?, ?, "User")
-            ON DUPLICATE KEY UPDATE email = VALUES(email)`, // this will never trigger for duplicate emails, as Cognito handles that
-            [sub, email]
+        const [[existing]] = await db.execute(
+            'SELECT id FROM users WHERE cognito_sub = ?', [sub]
         );
 
-        const isNewUser = result.affectedRows === 1;
+        if (!existing) {
+            await db.execute(
+                'INSERT INTO users (cognito_sub, email, display_name) VALUES (?, ?, "User")',
+                [sub, email]
+            );
+        }
+
+        const isNewUser = !existing;
 
         // Store the access token in an httpOnly cookie
         res.cookie('access_token', access_token, {
@@ -52,12 +56,28 @@ router.get('/callback', async function(req, res) {
             sameSite: 'lax'
         });
 
-        res.redirect(isNewUser ? '/createaccount' : '/');
+        res.redirect(isNewUser ? '/changeusername' : '/');
     } catch (err) {
-        console.error('Cognito error:', err.response?.data);
+        console.error('Cognito error:', {
+            message: err.message,
+            code: err.code,
+            status: err.response?.status,
+            data: err.response?.data,
+        });
+        
         // Instead of crashing, redirect back to signin
         res.redirect('/public/signin');
     }
+});
+
+router.get('/logout', function(req, res) {
+    res.clearCookie('access_token');
+
+    const logoutUrl = new URL(`${process.env.COGNITO_DOMAIN}/logout`);
+    logoutUrl.searchParams.set('client_id', process.env.COGNITO_CLIENT_ID);
+    logoutUrl.searchParams.set('logout_uri', process.env.COGNITO_LOGOUT_URI);
+
+    res.redirect(logoutUrl.toString());
 });
 
 module.exports = router;
