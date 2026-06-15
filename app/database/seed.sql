@@ -6,11 +6,11 @@ INSERT INTO users (cognito_sub, email, display_name) VALUES ('0003', 'merlin@ema
 INSERT INTO user_groups (name, invite_code, created_by_user_id) VALUES ('Awesome Group', '12345', 1);
 INSERT INTO user_groups (name, invite_code, created_by_user_id) VALUES ('Doink Group', '67890', 3);
 
-INSERT INTO group_members (group_id, user_id, role) VALUES (1, 1, 'owner');
+INSERT INTO group_members (group_id, user_id, role) VALUES (1, 1, 'admin');
 INSERT INTO group_members (group_id, user_id, role) VALUES (1, 2, 'member');
 INSERT INTO group_members (group_id, user_id, role) VALUES (1, 3, 'member');
 
-INSERT INTO group_members (group_id, user_id, role) VALUES (2, 3, 'owner');
+INSERT INTO group_members (group_id, user_id, role) VALUES (2, 3, 'admin');
 INSERT INTO group_members (group_id, user_id, role) VALUES (2, 2, 'member');
 
 INSERT INTO stickers (name, country) VALUES ('Messi', 'Argentina');

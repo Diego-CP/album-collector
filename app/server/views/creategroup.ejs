@@ -8,7 +8,7 @@
         <br>
         <form id="createGroupForm">
             <label for="gname">Group name:</label>
-            <input type="text" id="gname">
+            <input type="text" id="gname" name="gname" maxlength="20" minlength="2" required>
             <br><br>
             <input type="submit" value="Create">
         </form>
@@ -21,8 +21,8 @@
                 if (!groupName) {
                     alert("Please enter a group name.");
                     return;
-                } else if (groupName.length > 100) {
-                    alert("Group names cannot exceed 100 characters.");
+                } else if (groupName.length > 20 || groupName.length < 2) {
+                    alert("Group names must be between 2 and 20 characters.");
                     return;
                 }
 
@@ -37,7 +37,8 @@
                         alert(data.error);
                         return;
                     }
-                    console.log("Group created!", data);
+                    
+                    window.location.href = "/group/admin/" + data.groupId;
                 })
                 .catch(err => {
                     console.error("Error:", err);

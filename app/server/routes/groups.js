@@ -2,6 +2,7 @@ const express = require('express');
 const authenticateToken = require('../../middleware/auth');
 const router = express.Router();
 router.use(authenticateToken);
+const db = require('../db');
 
 function generateRandomCode() {
     var code = '';
@@ -19,7 +20,7 @@ router.post('/create', async function(req, res) {
 
         // Sanitize
         name = name.trim();
-        if (!name || name.length > 100) {
+        if (!name || name.length > 20 || name.length < 2) {
             return res.status(400).json({ error: "Invalid group name." });
         }
 
@@ -45,7 +46,7 @@ router.post('/create', async function(req, res) {
                 );
 
                 await connection.execute(
-                    "INSERT INTO group_members (group_id, user_id, role) VALUES (?, ?, 'owner')",
+                    "INSERT INTO group_members (group_id, user_id, role) VALUES (?, ?, 'admin')",
                     [result.insertId, userId]
                 );
 
@@ -66,7 +67,7 @@ router.post('/create', async function(req, res) {
             }
         }
 
-        res.redirect(`/group/admin/${result.insertId}`);
+        res.json({ groupId: result.insertId});
 
     } catch (err) {
         console.error(err);

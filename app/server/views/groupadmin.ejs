@@ -4,12 +4,14 @@
         <title>Album Collector</title>
     </head>
     <body>
-        <span class="subpage-title">Group <%= inviteCode %></span>
+        <span class="subpage-title">Group <%= groupName %></span>
+        <br>
+        <span class="subpage-title">Invite Code: <%= inviteCode %></span>
         <br>
         <span class="subtitle">Members</span>
         <ul>
         <% members.forEach(member => { %>
-            <li><%= member.username %> (ID: <%= member.id %>)</li>
+            <li><%= member.username %> (ID: <%= member.user_id %>)</li>
         <% }); %>
         </ul>
         <br>
