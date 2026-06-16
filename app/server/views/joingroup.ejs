@@ -8,7 +8,7 @@
         <br>
         <form id="joinGroupForm">
             <label for="gcode">Group code:</label>
-            <input type="text" id="gcode">
+            <input type="text" id="gcode" name="gcode" maxlength="7" minlength="7" required>
             <br><br>
             <input type="submit" value="Search & Join">
         </form>
@@ -21,8 +21,8 @@
                 if (!groupCode) {
                     alert("Please enter a group code.");
                     return;
-                } else if (groupCode.length > 10) {
-                    alert("Group codes cannot exceed 10 characters.");
+                } else if (groupCode.length > 7) {
+                    alert("Group codes are 7 characters long.");
                     return;
                 }
 
@@ -37,7 +37,9 @@
                         alert(data.error);
                         return;
                     }
-                    console.log("Group joined!", data);
+
+                    window.location.href = "/group/" + data.groupId;
+
                 })
                 .catch(err => {
                     console.error("Error:", err);

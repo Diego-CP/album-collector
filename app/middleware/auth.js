@@ -32,6 +32,9 @@ function authenticateToken(req, res, next) {
             if (req.path.startsWith('/api')) {
                 return res.status(403).json({ error: 'Invalid or expired token.' });
             }
+
+            res.clearCookie('access_token');
+
             return res.redirect('/public/signin');
         } 
         req.user = decoded;

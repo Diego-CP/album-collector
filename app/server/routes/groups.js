@@ -76,14 +76,12 @@ router.post('/create', async function(req, res) {
 });
 
 router.post('/join', async function(req, res){
-    res.json({ id: 1, name: "testname"});
-    /*
     try {
         let { code } = req.body;
 
         // Sanitize
         code = code.trim();
-        if (!code || code.length > 10) {
+        if (!code || code.length !== 7) {
             return res.status(400).json({ error: "Invalid group code." });
         }
 
@@ -99,29 +97,22 @@ router.post('/join', async function(req, res){
 
         const groupId = rows[0].id;
 
-        // Check if user is already a member
-        const [existing] = await db.execute(
-            'SELECT id FROM group_members WHERE group_id = ? AND user_id = ?',
-            [groupId, req.user.id]
+        const [result] = await db.execute(
+            `INSERT IGNORE INTO group_members (group_id, user_id, role)
+            SELECT ?, id, 'member' FROM users WHERE cognito_sub = ?`,
+            [groupId, req.user.sub]
         );
 
-        if (existing.length > 0) {
+        if (result.affectedRows === 0) {
             return res.status(409).json({ error: 'You are already a member of this group.' });
         }
 
-        // Add the member
-        await db.execute(
-            'INSERT INTO group_members (group_id, user_id, role) VALUES (?, ?, "member")',
-            [groupId, req.user.id]
-        );
-
-        res.json({ success: true });
+        res.json({ groupId });
 
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Something went wrong.' });
     }
-    */
 });
 
 module.exports = router;

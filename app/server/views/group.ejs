@@ -4,11 +4,16 @@
         <title>Album Collector</title>
     </head>
     <body>
-        <!-- TODO: Add group code to title -->
-        <span class="subpage-title">Group XYZ</span>
+        <span class="subpage-title">Group <%= groupName %></span>
         <br>
-        <!-- TODO -->
+        <span class="subpage-title">Invite Code: <%= inviteCode %></span>
+        <br>
         <span class="subtitle">Members</span>
+        <ul>
+        <% members.forEach(member => { %>
+            <li><%= member.username %> (ID: <%= member.user_id %>)</li>
+        <% }); %>
+        </ul>
         <br>
         <span class="subtitle">Trades</span>
     </body>
