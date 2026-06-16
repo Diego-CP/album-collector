@@ -46,6 +46,7 @@ router.get('/group/admin/:groupId', async function(req, res){
     if (!currentUser || currentUser.role !== 'admin') return res.status(403).send('Forbidden');
     
     res.render('groupadmin', {
+        groupId,
         inviteCode: results[0].invite_code,
         groupName: results[0].name,
         members: results.map(row => ({ user_id: row.user_id, username: row.display_name, role: row.role }))
@@ -68,6 +69,7 @@ router.get('/group/:groupId', async function(req, res){
     if (!isMember) return res.status(403).send('Forbidden');
         
     res.render('group', {
+        groupId,
         inviteCode: results[0].invite_code,
         groupName: results[0].name,
         members: results.map(row => ({ user_id: row.user_id, username: row.display_name }))

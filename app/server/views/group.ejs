@@ -16,5 +16,23 @@
         </ul>
         <br>
         <span class="subtitle">Trades</span>
+        <br>
+        <button onclick="leaveGroup()">Leave Group</button>
+        <script>
+        async function leaveGroup() {
+            fetch(`/api/groups/<%= groupId %>/leave`, { method: 'DELETE' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                window.location.href = "/";
+            })
+            .catch(err => {
+                console.error("Error:", err);
+            });
+        }
+        </script>
     </body>
 </html>

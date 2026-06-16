@@ -115,4 +115,34 @@ router.post('/join', async function(req, res){
     }
 });
 
+router.delete('/:groupId/leave', async function(req, res) {
+    const { groupId } = req.params;
+
+    const [result] = await db.execute(
+        `DELETE FROM group_members
+        WHERE group_id = ? AND user_id = (SELECT id FROM users WHERE cognito_sub = ?)`,
+        [groupId, req.user.sub]
+    );
+
+    if (result.affectedRows === 0) return res.status(404).json({ error: 'You are not a member of this group.' });
+
+    res.json({ success: true });
+});
+
+router.delete('/:groupId/delete', async function(req, res) {
+    const { groupId } = req.params;
+
+    const [result] = await db.execute(
+        `DELETE ug FROM user_groups ug
+         JOIN group_members gm ON ug.id = gm.group_id
+         JOIN users u ON gm.user_id = u.id
+         WHERE ug.id = ? AND u.cognito_sub = ? AND gm.role = 'admin'`,
+        [groupId, req.user.sub]
+    );
+
+    if (result.affectedRows === 0) return res.status(403).json({ error: 'You are not an admin of this group.' });
+
+    res.json({ success: true });
+});
+
 module.exports = router;

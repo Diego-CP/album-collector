@@ -16,5 +16,23 @@
         </ul>
         <br>
         <span class="subtitle">Trades</span>
+        <br>
+        <button onclick="deleteGroup()">Delete Group</button>
+        <script>
+        async function deleteGroup() {
+            fetch(`/api/groups/<%= groupId %>/delete`, { method: 'DELETE' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                window.location.href = "/";
+            })
+            .catch(err => {
+                console.error("Error:", err);
+            });
+        }
+        </script>
     </body>
 </html>
