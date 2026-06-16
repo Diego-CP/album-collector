@@ -145,4 +145,26 @@ router.delete('/:groupId/delete', async function(req, res) {
     res.json({ success: true });
 });
 
+router.delete('/:groupId/remove/:userId', async function(req, res) {
+    const { groupId, userId } = req.params;
+
+    const [isAdmin] = await db.execute(
+        `SELECT 1 FROM group_members gm
+         JOIN users u ON gm.user_id = u.id
+         WHERE gm.group_id = ? AND u.cognito_sub = ? AND gm.role = 'admin'`,
+        [groupId, req.user.sub]
+    );
+
+    if (!isAdmin.length) return res.status(403).json({ error: 'You are not an admin of this group.' });
+
+    const [result] = await db.execute(
+        `DELETE FROM group_members WHERE group_id = ? AND user_id = ? AND role != 'admin'`,
+        [groupId, userId]
+    );
+    
+    if (result.affectedRows === 0) return res.status(403).json({ error: 'Admins cannot be removed.' });
+
+    res.json({ success: true });
+});
+
 module.exports = router;

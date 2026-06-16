@@ -11,9 +11,30 @@
         <span class="subtitle">Members</span>
         <ul>
         <% members.forEach(member => { %>
-            <li><%= member.username %> (ID: <%= member.user_id %>, Role: <%= member.role %>)</li>
+            <li>
+                <%= member.username %> (ID: <%= member.user_id %>, Role: <%= member.role %>)
+                <% if (member.role !== 'admin') { %>
+                    <button onclick="removeMember('<%= member.user_id %>')">Remove Member</button>
+                <% } %>
+            </li>
         <% }); %>
         </ul>
+        <script>
+        function removeMember(userId) {
+            fetch(`/api/groups/<%= groupId %>/remove/${userId}`, { method: 'DELETE' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                window.location.reload();
+            })
+            .catch(err => {
+                console.error("Error:", err)
+            });
+        }
+        </script>
         <br>
         <span class="subtitle">Trades</span>
         <br>
