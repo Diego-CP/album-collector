@@ -33,39 +33,45 @@ router.get('/creategroup', function(req, res){
 router.get('/group/admin/:groupId', async function(req, res){
     const { groupId } = req.params;
 
-    const [results] = await db.query(`SELECT g.invite_code, g.name, gm.user_id, u.display_name
+    const [results] = await db.query(`SELECT g.invite_code, g.name, gm.user_id, gm.role, u.display_name, u.cognito_sub
         FROM user_groups g
         LEFT JOIN group_members gm ON g.id = gm.group_id
         LEFT JOIN users u ON gm.user_id = u.id
         WHERE g.id = ?`, 
         [groupId]);
     
-        if (!results.length) return res.status(404).send('Group not found');
-        
-        res.render('groupadmin', {
-            inviteCode: results[0].invite_code,
-            groupName: results[0].name,
-            members: results.map(row => ({ user_id: row.user_id, username: row.display_name }))
-        });
+    if (!results.length) return res.status(404).send('Group not found');
+
+    const currentUser = results.find(row => row.cognito_sub === req.user.sub);
+    if (!currentUser || currentUser.role !== 'admin') return res.status(403).send('Forbidden');
+    
+    res.render('groupadmin', {
+        inviteCode: results[0].invite_code,
+        groupName: results[0].name,
+        members: results.map(row => ({ user_id: row.user_id, username: row.display_name, role: row.role }))
+    });
 });
 
 router.get('/group/:groupId', async function(req, res){
     const { groupId } = req.params;
 
-    const [results] = await db.query(`SELECT g.invite_code, g.name, gm.user_id, u.display_name
+    const [results] = await db.query(`SELECT g.invite_code, g.name, gm.user_id, u.display_name, u.cognito_sub
         FROM user_groups g
         LEFT JOIN group_members gm ON g.id = gm.group_id
         LEFT JOIN users u ON gm.user_id = u.id
         WHERE g.id = ?`, 
         [groupId]);
     
-        if (!results.length) return res.status(404).send('Group not found');
+    if (!results.length) return res.status(404).send('Group not found');
+
+    const isMember = results.some(row => row.cognito_sub === req.user.sub);
+    if (!isMember) return res.status(403).send('Forbidden');
         
-        res.render('group', {
-            inviteCode: results[0].invite_code,
-            groupName: results[0].name,
-            members: results.map(row => ({ user_id: row.user_id, username: row.display_name }))
-        });
+    res.render('group', {
+        inviteCode: results[0].invite_code,
+        groupName: results[0].name,
+        members: results.map(row => ({ user_id: row.user_id, username: row.display_name }))
+    });
 });
 
 module.exports = router;

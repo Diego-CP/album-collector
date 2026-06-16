@@ -11,7 +11,7 @@
         <span class="subtitle">Members</span>
         <ul>
         <% members.forEach(member => { %>
-            <li><%= member.username %> (ID: <%= member.user_id %>)</li>
+            <li><%= member.username %> (ID: <%= member.user_id %>, Role: <%= member.role %>)</li>
         <% }); %>
         </ul>
         <br>
