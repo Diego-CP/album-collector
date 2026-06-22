@@ -18,10 +18,6 @@ router.get('/collection', function(req, res){
     res.render('collection'); 
 });
 
-router.get('/collection/edit', function(req, res){
-    res.render('editcollection'); 
-});
-
 router.get('/join', function(req, res){
     res.render('joingroup'); 
 });

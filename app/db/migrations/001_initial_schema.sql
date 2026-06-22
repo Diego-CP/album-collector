@@ -1,7 +1,4 @@
--- create database
-CREATE DATABASE IF NOT EXISTS albumcollector;
-USE albumcollector;
-
+-- migrate:up
 -- create tables
 CREATE TABLE users (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -39,16 +36,19 @@ CREATE TABLE group_members (
     ON DELETE CASCADE
 );
 
+-- TODO: Keep track of parallels
 CREATE TABLE stickers (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(150) NOT NULL,
-  country VARCHAR(100)
+  section VARCHAR(50) NOT NULL,
+  card_code VARCHAR(50) NOT NULL UNIQUE,
+  card_type ENUM('Player', 'Team Photo', 'Crest (Foil)', 'Special') NOT NULL
 );
 
 CREATE TABLE collection (
   user_id BIGINT NOT NULL,
   sticker_id BIGINT NOT NULL,
-  amount INT NOT NULL DEFAULT 0,
+  duplicates_amount INT NOT NULL DEFAULT 0,
   needs BOOL NOT NULL DEFAULT 0,
   
   PRIMARY KEY (user_id, sticker_id),
@@ -61,7 +61,7 @@ CREATE TABLE collection (
     REFERENCES stickers(id)
     ON DELETE CASCADE,
 
-  CHECK (amount >= 0)
+  CHECK (duplicates_amount >= 0)
 );
 
 CREATE TABLE trade_calculations (
@@ -115,3 +115,13 @@ CREATE TABLE trade_steps (
   UNIQUE KEY uq_trade_step_order
     (trade_id, step_order)
 );
+
+-- migrate:down
+DROP TABLE users;
+DROP TABLE user_groups;
+DROP TABLE group_members;
+DROP TABLE stickers;
+DROP TABLE collection;
+DROP TABLE trade_calculations;
+DROP TABLE trades;
+DROP TABLE trade_steps;

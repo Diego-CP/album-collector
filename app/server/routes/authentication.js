@@ -41,13 +41,33 @@ router.get('/callback', async function(req, res) {
         );
 
         if (!existing) {
-            await db.execute(
-                'INSERT INTO users (cognito_sub, email, display_name) VALUES (?, ?, "User")',
-                [sub, email]
-            );
-        }
+            const connection = await db.getConnection();
 
-        const isNewUser = !existing;
+            try {
+                await connection.beginTransaction();
+
+                await connection.execute(
+                    'INSERT INTO users (cognito_sub, email, display_name) VALUES (?, ?, "User")',
+                    [sub, email]
+                );
+
+                await connection.execute(
+                    `INSERT INTO collection (user_id, sticker_id)
+                    SELECT u.id, s.id
+                    FROM users u
+                    CROSS JOIN stickers s
+                    WHERE u.cognito_sub = ?`,
+                    [sub]
+                );
+
+                await connection.commit();
+            } catch(err) {
+                await connection.rollback();
+                throw err;
+            } finally {
+                connection.release();
+            }
+        }
 
         // Store the access token in an httpOnly cookie
         res.cookie('access_token', access_token, {
@@ -56,7 +76,7 @@ router.get('/callback', async function(req, res) {
             sameSite: 'lax'
         });
 
-        res.redirect(isNewUser ? '/changeusername' : '/');
+        res.redirect(existing ? '/' : '/changeusername');
     } catch (err) {
         console.error('Cognito error:', {
             message: err.message,
