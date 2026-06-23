@@ -34,6 +34,9 @@ app.use('/api/groups', require('./app/server/routes/groups'));
 // User API routes
 app.use('/api/users', require('./app/server/routes/users'));
 
+// Collection API routes
+app.use('/api/collections', require('./app/server/routes/collections'));
+
 const server = http.createServer(app).listen(app.get('port'), function(){
 	console.log('The application is running on port ' + app.get('port'));
 }); // Http server is created

@@ -6,5 +6,117 @@
     <body>
         <span class="subpage-title">My Collection</span>
         <br>
+
+        <div id="collection-data" data-collection="<%= stickersJson %>" style="display:none"></div>
+
+        <% 
+            let currentSection = null;
+        %>
+
+        <% stickers.forEach(sticker => { %>
+            <% if (sticker.section !== currentSection) { %>
+                <% if (currentSection !== null) { %></ul><% } %>
+                <% currentSection = sticker.section %>
+                <br>
+                <span class="subtitle"><%= sticker.section %></span>
+                <ul>
+            <% } %>
+
+            <li>
+                <strong><%= sticker.sticker_code %></strong> — <%= sticker.name %> (<%= sticker.sticker_type %>)
+                &nbsp;
+                <label>
+                    <input
+                        type="checkbox"
+                        class="needs-checkbox"
+                        data-id="<%= sticker.id %>"
+                        <%= !sticker.needs ? 'checked' : '' %>
+                    /> Have it
+                </label>
+                &nbsp;
+                <span class="counter-wrap" id="counter-<%= sticker.id %>" data-needs="<%= sticker.needs %>">
+                    <button class="dec-btn" data-id="<%= sticker.id %>">-</button>
+                    <span id="val-<%= sticker.id %>"><%= sticker.duplicates_amount %></span>
+                    <button class="inc-btn" data-id="<%= sticker.id %>">+</button>
+                    extras
+                </span>
+            </li>
+        <% }) %>
+
+        <% if (currentSection !== null) { %></ul><% } %>
+
+        <br>
+        <button id="save-btn">Save</button>
+
+        <script>
+            const state = JSON.parse(document.getElementById('collection-data').dataset.collection);
+            const dirty = new Set();
+
+            document.querySelectorAll('.counter-wrap').forEach(counter => {
+                if (counter.dataset.needs === '1') {
+                    counter.style.visibility = 'hidden';
+                }
+            });
+
+            document.querySelectorAll('.needs-checkbox').forEach(chk => {
+                chk.addEventListener('change', () => onToggle(chk.dataset.id, chk.checked));
+            });
+            document.querySelectorAll('.inc-btn').forEach(btn => {
+                btn.addEventListener('click', () => onIncrement(btn.dataset.id));
+            });
+            document.querySelectorAll('.dec-btn').forEach(btn => {
+                btn.addEventListener('click', () => onDecrement(btn.dataset.id));
+            });
+            document.getElementById('save-btn').addEventListener('click', saveCollection);
+
+            function onToggle(id, checked) {
+                dirty.add(id);
+                state[id].needs = !checked;
+                const counter = document.getElementById(`counter-${id}`);
+                if (checked) {
+                    counter.style.visibility = 'visible';
+                } else {
+                    state[id].duplicates_amount = 0;
+                    document.getElementById(`val-${id}`).textContent = 0;
+                    counter.style.visibility = 'hidden';
+                }
+            }
+
+            function onIncrement(id) {
+                dirty.add(id);
+                state[id].duplicates_amount++;
+                document.getElementById(`val-${id}`).textContent = state[id].duplicates_amount;
+            }
+
+            function onDecrement(id) {
+                if (state[id].duplicates_amount <= 0) return;
+                dirty.add(id);
+                state[id].duplicates_amount--;
+                document.getElementById(`val-${id}`).textContent = state[id].duplicates_amount;
+            }
+
+            async function saveCollection() {
+                if (dirty.size === 0) { alert('No changes to save.'); return; }
+
+                const updates = [...dirty].map(id => ({
+                    sticker_id: parseInt(id),
+                    needs: state[id].needs,
+                    duplicates_amount: state[id].duplicates_amount
+                }));
+
+                fetch('/api/collections/update', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ updates })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) { alert(data.error); return; }
+                    dirty.clear();
+                    alert('Collection saved!');
+                })
+                .catch(err => console.error('Error:', err));
+            }
+        </script>
     </body>
 </html>

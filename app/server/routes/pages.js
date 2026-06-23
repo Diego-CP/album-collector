@@ -4,18 +4,42 @@ const db = require('../db');
 
 router.get('/', async function(req, res){
     const [[user]] = await db.execute(
-        'SELECT display_name FROM users WHERE cognito_sub = ?', [req.user.sub]
+        'SELECT id, display_name FROM users WHERE cognito_sub = ?', [req.user.sub]
     );
 
-    res.render('homepage', { username: user.display_name });
+    const [groups] = await db.execute(
+        `SELECT ug.id, ug.name, gm.role
+         FROM group_members gm
+         JOIN user_groups ug ON gm.group_id = ug.id
+         WHERE gm.user_id = ?`,
+        [user.id]
+    );
+
+    res.render('homepage', { username: user.display_name, groups });
 });
 
 router.get('/changeusername', function(req, res){
     res.render('changeusername');
 });
 
-router.get('/collection', function(req, res){
-    res.render('collection'); 
+router.get('/collection', async function(req, res) {
+    const [stickers] = await db.query(
+        `SELECT s.id, s.sticker_code, s.name, s.section, s.sticker_type,
+                COALESCE(c.needs, 1) AS needs,
+                COALESCE(c.duplicates_amount, 0) AS duplicates_amount
+         FROM stickers s
+         LEFT JOIN collection c ON c.sticker_id = s.id AND c.user_id = (SELECT id FROM users WHERE cognito_sub = ?)
+         ORDER BY s.section, s.id`,
+        [req.user.sub]
+    );
+
+    const stickersJson = JSON.stringify(
+        Object.fromEntries(
+            stickers.map(s => [s.id, { needs: s.needs === 1, duplicates_amount: s.duplicates_amount }])
+        )
+    );
+
+    res.render('collection', { stickers, stickersJson });
 });
 
 router.get('/join', function(req, res){

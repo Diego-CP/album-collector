@@ -24,12 +24,13 @@ router.post('/create', async function(req, res) {
             return res.status(400).json({ error: "Invalid group name." });
         }
 
-        const [rows] = await db.execute(
+        const [userRows] = await db.execute(
             'SELECT id FROM users WHERE cognito_sub = ?',
             [req.user.sub]
         );
-        
-        const userId = rows[0].id;
+        if (!userRows.length) return res.status(401).json({ error: 'User not found.' });
+
+        const userId = userRows[0].id;
 
         let result;
         let attempts = 0;

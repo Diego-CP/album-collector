@@ -1,5 +1,5 @@
 -- migrate:up
-INSERT INTO stickers (name, section, card_code, card_type) VALUES
+INSERT INTO stickers (name, section, sticker_code, sticker_type) VALUES
   ('Panini', 'Intro', '00', 'Special'),
   ('Official Emblem 1', 'Intro', 'FWC1', 'Special'),
   ('Official Emblem 2', 'Intro', 'FWC2', 'Special'),

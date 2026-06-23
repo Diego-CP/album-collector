@@ -19,7 +19,7 @@ CREATE TABLE `collection` (
   `user_id` bigint NOT NULL,
   `sticker_id` bigint NOT NULL,
   `duplicates_amount` int NOT NULL DEFAULT '0',
-  `needs` tinyint(1) NOT NULL DEFAULT '0',
+  `needs` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`user_id`,`sticker_id`),
   KEY `sticker_id` (`sticker_id`),
   CONSTRAINT `collection_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
@@ -67,10 +67,10 @@ CREATE TABLE `stickers` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `name` varchar(150) NOT NULL,
   `section` varchar(50) NOT NULL,
-  `card_code` varchar(50) NOT NULL,
-  `card_type` enum('Player','Team Photo','Crest (Foil)','Special') NOT NULL,
+  `sticker_code` varchar(50) NOT NULL,
+  `sticker_type` enum('Player','Team Photo','Crest (Foil)','Special') NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `card_code` (`card_code`)
+  UNIQUE KEY `sticker_code` (`sticker_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

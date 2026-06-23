@@ -29,7 +29,31 @@
                 window.location.href = "/auth/logout";
             });
         </script>
-        <!-- TODO: Add Groups element, pulling available groups -->
         <span class="subtitle">Groups</span>
+        <% groups.forEach(function(group) { %>
+            <br>
+            <button
+                type="button"
+                class="home-button home-group"
+                data-group-id="<%= group.id %>"
+                data-group-role="<%= group.role %>"
+            >
+                <%= group.name %> · <%= group.role === 'admin' ? 'Admin' : 'Member' %>
+            </button>
+        <% }) %>
+        <% if (groups.length === 0) { %>
+            <br>
+            <span class="subtitle">You're not in any groups yet.</span>
+        <% } %>
+
+        <script>
+            document.querySelectorAll('.home-group').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const id = this.dataset.groupId;
+                    const role = this.dataset.groupRole;
+                    window.location.href = role === 'admin' ? '/group/admin/' + id : '/group/' + id;
+                });
+            });
+        </script>
     </body>
 </html>

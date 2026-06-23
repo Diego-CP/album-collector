@@ -41,15 +41,15 @@ CREATE TABLE stickers (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(150) NOT NULL,
   section VARCHAR(50) NOT NULL,
-  card_code VARCHAR(50) NOT NULL UNIQUE,
-  card_type ENUM('Player', 'Team Photo', 'Crest (Foil)', 'Special') NOT NULL
+  sticker_code VARCHAR(50) NOT NULL UNIQUE,
+  sticker_type ENUM('Player', 'Team Photo', 'Crest (Foil)', 'Special') NOT NULL
 );
 
 CREATE TABLE collection (
   user_id BIGINT NOT NULL,
   sticker_id BIGINT NOT NULL,
   duplicates_amount INT NOT NULL DEFAULT 0,
-  needs BOOL NOT NULL DEFAULT 0,
+  needs BOOL NOT NULL DEFAULT 1,
   
   PRIMARY KEY (user_id, sticker_id),
 
