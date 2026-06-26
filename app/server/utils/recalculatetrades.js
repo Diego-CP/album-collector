@@ -1,12 +1,22 @@
 const db = require('../db');
 
 async function recalculateTrades(groupId) {
+    await db.execute(
+        `DELETE FROM trade_calculations WHERE group_id = ?`,
+        [groupId]
+    );    
+
     const [calcResult] = await db.execute(
         `INSERT INTO trade_calculations (group_id, status, started_at)
          VALUES (?, 'processing', NOW())`,
         [groupId]
     );
     const calculationId = calcResult.insertId;
+
+    await db.execute(
+        `DELETE FROM trades WHERE group_id = ?`,
+        [groupId]
+    );
 
     try {
         const [members] = await db.execute(
@@ -124,14 +134,9 @@ async function recalculateTrades(groupId) {
             }
         }
 
-        await db.execute(
-            `UPDATE trades SET status = 'stale' WHERE group_id = ? AND status = 'available'`,
-            [groupId]
-        );
-
         for (const steps of newTrades) {
             const [tradeResult] = await db.execute(
-                `INSERT INTO trades (group_id, status) VALUES (?, 'available')`,
+                `INSERT INTO trades (group_id) VALUES (?)`,
                 [groupId]
             );
             const tradeId = tradeResult.insertId;

@@ -80,7 +80,6 @@ CREATE TABLE trade_calculations (
 CREATE TABLE trades (
   id BIGINT AUTO_INCREMENT PRIMARY KEY,
   group_id BIGINT NOT NULL,
-  status ENUM('available', 'stale') NOT NULL DEFAULT 'available',
 
   FOREIGN KEY (group_id)
     REFERENCES user_groups(id)

@@ -98,7 +98,7 @@ router.get('/group/admin/:groupId', async function(req, res){
         JOIN users fu ON fu.id = ts.from_user_id
         JOIN users tu ON tu.id = ts.to_user_id
         JOIN stickers s ON s.id = ts.sticker_id
-        WHERE t.group_id = ? AND t.status = 'available'
+        WHERE t.group_id = ?
         ORDER BY t.id, ts.step_order`,
         [groupId]);
 
@@ -141,11 +141,19 @@ router.get('/group/:groupId', async function(req, res){
         JOIN users fu ON fu.id = ts.from_user_id
         JOIN users tu ON tu.id = ts.to_user_id
         JOIN stickers s ON s.id = ts.sticker_id
-        WHERE t.group_id = ? AND t.status = 'available'
+        WHERE t.group_id = ?
         ORDER BY t.id, ts.step_order`,
         [groupId]);
 
+    const [calcRows] = await db.query(
+        `SELECT status FROM trade_calculations
+         WHERE group_id = ?
+         LIMIT 1`,
+        [groupId]
+    );
+
     const trades = groupTradeRows(tradeRows);
+    const calcStatus = calcRows[0]?.status ?? null;
         
     res.render('group', {
         groupId,
@@ -153,6 +161,7 @@ router.get('/group/:groupId', async function(req, res){
         groupName: results[0].name,
         members: results.map(row => ({ user_id: row.user_id, username: row.display_name })),
         trades,
+        calcStatus,
     });
 });
 

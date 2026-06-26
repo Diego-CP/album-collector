@@ -128,7 +128,6 @@ CREATE TABLE `trade_steps` (
 CREATE TABLE `trades` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `group_id` bigint NOT NULL,
-  `status` enum('available','stale') NOT NULL DEFAULT 'available',
   PRIMARY KEY (`id`),
   KEY `group_id` (`group_id`),
   CONSTRAINT `trades_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `user_groups` (`id`) ON DELETE CASCADE

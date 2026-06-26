@@ -16,8 +16,12 @@
         </ul>
         <br>
         <span class="subtitle">Trades</span>
-        <% if (trades.length === 0) { %>
+        <% if (calcStatus === 'failed') { %>
+            <p>Error calculating trades.</p>
+        <% } else if (trades.length === 0) { %>
             <p>No trades available.</p>
+        <% } else if (calcStatus === 'processing') { %>
+            <p>Trades are being calculated.</p>
         <% } else { %>
             <ul>
             <% trades.forEach(trade => { %>
