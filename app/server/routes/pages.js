@@ -2,6 +2,26 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 
+function groupTradeRows(tradeRows) {
+    const tradesMap = new Map();
+
+    for (const row of tradeRows) {
+        if (!tradesMap.has(row.trade_id)) {
+            tradesMap.set(row.trade_id, { id: row.trade_id, steps: [] });
+        }
+        tradesMap.get(row.trade_id).steps.push({
+            step_order: row.step_order,
+            from_user: row.from_user,
+            to_user: row.to_user,
+            sticker_name: row.sticker_name,
+            sticker_code: row.sticker_code,
+            quantity: row.quantity,
+        });
+    }
+
+    return Array.from(tradesMap.values());
+}
+
 router.get('/', async function(req, res){
     const [[user]] = await db.execute(
         'SELECT id, display_name FROM users WHERE cognito_sub = ?', [req.user.sub]
@@ -64,12 +84,32 @@ router.get('/group/admin/:groupId', async function(req, res){
 
     const currentUser = results.find(row => row.cognito_sub === req.user.sub);
     if (!currentUser || currentUser.role !== 'admin') return res.status(403).send('Forbidden');
-    
+
+    const [tradeRows] = await db.query(`
+        SELECT t.id AS trade_id,
+               ts.step_order,
+               ts.quantity,
+               fu.display_name AS from_user,
+               tu.display_name AS to_user,
+               s.name AS sticker_name,
+               s.sticker_code
+        FROM trades t
+        JOIN trade_steps ts ON ts.trade_id = t.id
+        JOIN users fu ON fu.id = ts.from_user_id
+        JOIN users tu ON tu.id = ts.to_user_id
+        JOIN stickers s ON s.id = ts.sticker_id
+        WHERE t.group_id = ? AND t.status = 'available'
+        ORDER BY t.id, ts.step_order`,
+        [groupId]);
+
+    const trades = groupTradeRows(tradeRows);
+
     res.render('groupadmin', {
         groupId,
         inviteCode: results[0].invite_code,
         groupName: results[0].name,
-        members: results.map(row => ({ user_id: row.user_id, username: row.display_name, role: row.role }))
+        members: results.map(row => ({ user_id: row.user_id, username: row.display_name, role: row.role })),
+        trades,
     });
 });
 
@@ -87,12 +127,32 @@ router.get('/group/:groupId', async function(req, res){
 
     const isMember = results.some(row => row.cognito_sub === req.user.sub);
     if (!isMember) return res.status(403).send('Forbidden');
+
+    const [tradeRows] = await db.query(`
+        SELECT t.id AS trade_id,
+               ts.step_order,
+               ts.quantity,
+               fu.display_name AS from_user,
+               tu.display_name AS to_user,
+               s.name AS sticker_name,
+               s.sticker_code
+        FROM trades t
+        JOIN trade_steps ts ON ts.trade_id = t.id
+        JOIN users fu ON fu.id = ts.from_user_id
+        JOIN users tu ON tu.id = ts.to_user_id
+        JOIN stickers s ON s.id = ts.sticker_id
+        WHERE t.group_id = ? AND t.status = 'available'
+        ORDER BY t.id, ts.step_order`,
+        [groupId]);
+
+    const trades = groupTradeRows(tradeRows);
         
     res.render('group', {
         groupId,
         inviteCode: results[0].invite_code,
         groupName: results[0].name,
-        members: results.map(row => ({ user_id: row.user_id, username: row.display_name }))
+        members: results.map(row => ({ user_id: row.user_id, username: row.display_name })),
+        trades,
     });
 });
 

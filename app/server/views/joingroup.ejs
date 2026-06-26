@@ -37,7 +37,7 @@
                         alert(data.error);
                         return;
                     }
-
+                    console.log("Redirecting to group:", data.groupId);
                     window.location.href = "/group/" + data.groupId;
 
                 })

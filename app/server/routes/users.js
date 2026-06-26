@@ -30,14 +30,19 @@ router.post('/changeusername', async function(req, res) {
 });
 
 router.get('/getusername', async function(req, res) {
-    const [[user]] = await db.execute(
-        'SELECT display_name FROM users WHERE cognito_sub = ?', 
-        [req.user.sub]
-    );
+    try {
+        const [[user]] = await db.execute(
+            'SELECT display_name FROM users WHERE cognito_sub = ?', 
+            [req.user.sub]
+        );
 
-    if (!user) return res.status(404).json({ error: 'User not found.' });
+        if (!user) return res.status(404).json({ error: 'User not found.' });
 
-    res.json({ username: user.display_name });
+        res.json({ username: user.display_name });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Something went wrong.' });
+    }
 });
 
 module.exports = router;

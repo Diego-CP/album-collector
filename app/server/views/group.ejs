@@ -16,6 +16,23 @@
         </ul>
         <br>
         <span class="subtitle">Trades</span>
+        <% if (trades.length === 0) { %>
+            <p>No trades available.</p>
+        <% } else { %>
+            <ul>
+            <% trades.forEach(trade => { %>
+                <li>
+                    <ul>
+                    <% trade.steps.forEach(step => { %>
+                        <li>
+                            <%= step.from_user %> gives <strong><%= step.sticker_name %> (<%= step.sticker_code %>)</strong> to <%= step.to_user %>
+                        </li>
+                    <% }); %>
+                    </ul>
+                </li>
+            <% }); %>
+            </ul>
+        <% } %>
         <br>
         <button onclick="leaveGroup()">Leave Group</button>
         <script>

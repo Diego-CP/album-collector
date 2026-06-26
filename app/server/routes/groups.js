@@ -1,5 +1,6 @@
 const express = require('express');
 const authenticateToken = require('../../middleware/auth');
+const recalculateTrades = require('../utils/recalculatetrades');
 const router = express.Router();
 router.use(authenticateToken);
 const db = require('../db');
@@ -108,7 +109,9 @@ router.post('/join', async function(req, res){
             return res.status(409).json({ error: 'You are already a member of this group.' });
         }
 
-        res.json({ groupId });
+        await recalculateTrades(groupId);
+
+        res.json({ groupId: groupId });
 
     } catch (err) {
         console.error(err);
@@ -117,55 +120,74 @@ router.post('/join', async function(req, res){
 });
 
 router.delete('/:groupId/leave', async function(req, res) {
-    const { groupId } = req.params;
+    try {    
+        const { groupId } = req.params;
 
-    const [result] = await db.execute(
-        `DELETE FROM group_members
-        WHERE group_id = ? AND user_id = (SELECT id FROM users WHERE cognito_sub = ?)`,
-        [groupId, req.user.sub]
-    );
+        const [result] = await db.execute(
+            `DELETE FROM group_members
+            WHERE group_id = ? AND user_id = (SELECT id FROM users WHERE cognito_sub = ?)`,
+            [groupId, req.user.sub]
+        );
 
-    if (result.affectedRows === 0) return res.status(404).json({ error: 'You are not a member of this group.' });
+        if (result.affectedRows === 0) return res.status(404).json({ error: 'You are not a member of this group.' });
 
-    res.json({ success: true });
+        await recalculateTrades(groupId);
+
+        res.json({ success: true });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Something went wrong.' });
+    }
 });
 
 router.delete('/:groupId/delete', async function(req, res) {
-    const { groupId } = req.params;
+    try {    
+        const { groupId } = req.params;
 
-    const [result] = await db.execute(
-        `DELETE ug FROM user_groups ug
-         JOIN group_members gm ON ug.id = gm.group_id
-         JOIN users u ON gm.user_id = u.id
-         WHERE ug.id = ? AND u.cognito_sub = ? AND gm.role = 'admin'`,
-        [groupId, req.user.sub]
-    );
+        const [result] = await db.execute(
+            `DELETE ug FROM user_groups ug
+            JOIN group_members gm ON ug.id = gm.group_id
+            JOIN users u ON gm.user_id = u.id
+            WHERE ug.id = ? AND u.cognito_sub = ? AND gm.role = 'admin'`,
+            [groupId, req.user.sub]
+        );
 
-    if (result.affectedRows === 0) return res.status(403).json({ error: 'You are not an admin of this group.' });
+        if (result.affectedRows === 0) return res.status(403).json({ error: 'You are not an admin of this group.' });
 
-    res.json({ success: true });
+        res.json({ success: true });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Something went wrong.' });
+    }
 });
 
 router.delete('/:groupId/remove/:userId', async function(req, res) {
-    const { groupId, userId } = req.params;
+    try {    
+        const { groupId, userId } = req.params;
 
-    const [isAdmin] = await db.execute(
-        `SELECT 1 FROM group_members gm
-         JOIN users u ON gm.user_id = u.id
-         WHERE gm.group_id = ? AND u.cognito_sub = ? AND gm.role = 'admin'`,
-        [groupId, req.user.sub]
-    );
+        const [isAdmin] = await db.execute(
+            `SELECT 1 FROM group_members gm
+            JOIN users u ON gm.user_id = u.id
+            WHERE gm.group_id = ? AND u.cognito_sub = ? AND gm.role = 'admin'`,
+            [groupId, req.user.sub]
+        );
 
-    if (!isAdmin.length) return res.status(403).json({ error: 'You are not an admin of this group.' });
+        if (!isAdmin.length) return res.status(403).json({ error: 'You are not an admin of this group.' });
 
-    const [result] = await db.execute(
-        `DELETE FROM group_members WHERE group_id = ? AND user_id = ? AND role != 'admin'`,
-        [groupId, userId]
-    );
-    
-    if (result.affectedRows === 0) return res.status(403).json({ error: 'Admins cannot be removed.' });
+        const [result] = await db.execute(
+            `DELETE FROM group_members WHERE group_id = ? AND user_id = ? AND role != 'admin'`,
+            [groupId, userId]
+        );
+        
+        if (result.affectedRows === 0) return res.status(403).json({ error: 'Admins cannot be removed.' });
 
-    res.json({ success: true });
+        await recalculateTrades(groupId);
+
+        res.json({ success: true });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Something went wrong.' });
+    }
 });
 
 module.exports = router;
