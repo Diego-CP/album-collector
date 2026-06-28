@@ -1,28 +1,55 @@
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <link rel="stylesheet" href="/styles/styles.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        <link rel="preload" href="/fonts/mex_font.otf" as="font" type="font/otf" crossorigin />
         <title>Album Collector</title>
     </head>
-    <body>
-        <span class="subpage-title">Album Collector</span>
-        <br>
-        <form id="createUsername">
-            <label for="uname">Enter a new username:</label>
-            <input type="text" id="uname" maxlength="20" minlength="2" required>
-            <br><br>
-            <input type="submit" value="Submit">
-        </form>
+    <body class="form-page">
+        <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+        <main class="form-card">
+            <span class="subpage-title">Album Collector</span>
+            <form id="createUsername" class="form-body">
+                <label for="uname" class="form-label">Enter a new username</label>
+                <input
+                    type="text"
+                    id="uname"
+                    class="form-input"
+                    maxlength="20"
+                    minlength="2"
+                    placeholder="stickerfan_26"
+                    required
+                >
+                <input type="submit" class="form-submit" value="Submit">
+            </form>
+        </main>
+
         <script>
+            let toastTimer;
+            function showMessage(text, type = 'info') {
+                const toast = document.getElementById('toast');
+                toast.textContent = text;
+                toast.className = 'toast toast-' + type + ' toast-show';
+                clearTimeout(toastTimer);
+                toastTimer = setTimeout(() => {
+                    toast.className = 'toast toast-' + type;
+                }, 3000);
+            }
+
             document.getElementById("createUsername").addEventListener("submit", function (e) {
                 e.preventDefault(); // stops the form from reloading the page
 
                 const username = document.getElementById("uname").value.trim();
 
                 if (!username) {
-                    alert("Please enter a username.");
+                    showMessage("Please enter a username.", "error");
                     return;
                 } else if (username.length > 20 || username.length < 2) {
-                    alert("Usernames must be between 2 and 20 characters.");
+                    showMessage("Usernames must be between 2 and 20 characters.", "error");
                     return;
                 }
 
@@ -34,7 +61,7 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.error) {
-                        alert(data.error);
+                        showMessage(data.error, "error");
                         return;
                     }
 

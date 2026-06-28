@@ -1,76 +1,123 @@
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <link rel="stylesheet" href="/styles/styles.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        <link rel="preload" href="/fonts/mex_font.otf" as="font" type="font/otf" crossorigin />
         <title>Album Collector</title>
     </head>
-    <body>
-        <span class="subpage-title">Group <%= groupName %></span>
-        <br>
-        <span class="subpage-title">Invite Code: <%= inviteCode %></span>
-        <br>
-        <span class="subtitle">Members</span>
-        <ul>
-        <% members.forEach(member => { %>
-            <li>
-                <%= member.username %> (ID: <%= member.user_id %>, Role: <%= member.role %>)
-                <% if (member.role !== 'admin') { %>
-                    <button onclick="removeMember('<%= member.user_id %>')">Remove Member</button>
-                <% } %>
-            </li>
-        <% }); %>
-        </ul>
-        <br>
-        <span class="subtitle">Trades</span>
-        <% if (trades.length === 0) { %>
-            <p>No trades available.</p>
-        <% } else { %>
-            <ul>
-            <% trades.forEach(trade => { %>
-                <li>
-                    <ul>
-                    <% trade.steps.forEach(step => { %>
-                        <li>
-                            <%= step.from_user %> gives <strong><%= step.sticker_name %> (<%= step.sticker_code %>)</strong> to <%= step.to_user %>
-                        </li>
-                    <% }); %>
-                    </ul>
-                </li>
-            <% }); %>
+    <body class="group-page">
+        <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+        <header class="app-header">
+            <a href="/" class="page-home-link">← Home</a>
+            <a href="/" class="app-header-title">Album Collector</a>
+            <a href="/auth/logout" class="app-header-logout">Logout</a>
+        </header>
+
+        <header class="group-header">
+            <span class="subpage-title">Group: <%= groupName %></span>
+            <div class="invite-chip">
+                <span class="invite-chip-label">Invite Code</span>
+                <span class="invite-chip-code"><%= inviteCode %></span>
+            </div>
+        </header>
+
+        <section class="group-section">
+            <span class="subtitle group-section-heading">Members</span>
+            <ul class="member-list">
+                <% members.forEach(member => { %>
+                    <li class="member-card">
+                        <div class="member-card-info">
+                            <span class="member-name"><%= member.username %></span>
+                            <span class="member-role member-role--<%= member.role === 'admin' ? 'admin' : 'member' %>">
+                                <%= member.role %>
+                            </span>
+                        </div>
+                        <% if (member.role !== 'admin') { %>
+                            <button class="member-remove-btn" onclick="removeMember('<%= member.user_id %>')">Remove</button>
+                        <% } %>
+                    </li>
+                <% }); %>
             </ul>
-        <% } %>
-        <br>
+        </section>
+
+        <section class="group-section">
+            <span class="subtitle group-section-heading">Trades</span>
+            <% if (trades.length === 0) { %>
+                <p class="notice">No trades available.</p>
+            <% } else { %>
+                <div class="trade-list">
+                <% trades.forEach((trade, i) => { %>
+                    <div class="trade-card">
+                        <span class="trade-card-title">Trade <%= i + 1 %></span>
+                        <ul class="trade-steps">
+                        <% trade.steps.forEach(step => { %>
+                            <li class="trade-step">
+                                <span class="trade-user"><%= step.from_user %></span>
+                                <span class="trade-arrow">→</span>
+                                <span class="trade-sticker">
+                                    <strong><%= step.sticker_name %></strong>
+                                    <span class="trade-code"><%= step.sticker_code %></span>
+                                </span>
+                                <span class="trade-arrow">→</span>
+                                <span class="trade-user"><%= step.to_user %></span>
+                            </li>
+                        <% }); %>
+                        </ul>
+                    </div>
+                <% }); %>
+                </div>
+            <% } %>
+        </section>
+
+        <div class="group-footer">
+            <button class="group-delete-btn" onclick="deleteGroup()">Delete Group</button>
+        </div>
+
         <script>
-        function removeMember(userId) {
-            fetch(`/api/groups/<%= groupId %>/remove/${userId}`, { method: 'DELETE' })
-            .then(res => res.json())
-            .then(data => {
-                if (data.error) {
-                    alert(data.error);
-                    return;
-                }
-                window.location.reload();
-            })
-            .catch(err => {
-                console.error("Error:", err)
-            });
-        }
-        </script>
-        <button onclick="deleteGroup()">Delete Group</button>
-        <script>
-        async function deleteGroup() {
-            fetch(`/api/groups/<%= groupId %>/delete`, { method: 'DELETE' })
-            .then(res => res.json())
-            .then(data => {
-                if (data.error) {
-                    alert(data.error);
-                    return;
-                }
-                window.location.href = "/";
-            })
-            .catch(err => {
-                console.error("Error:", err);
-            });
-        }
+            let toastTimer;
+            function showMessage(text, type = 'info') {
+                const toast = document.getElementById('toast');
+                toast.textContent = text;
+                toast.className = 'toast toast-' + type + ' toast-show';
+                clearTimeout(toastTimer);
+                toastTimer = setTimeout(() => {
+                    toast.className = 'toast toast-' + type;
+                }, 3000);
+            }
+
+            function removeMember(userId) {
+                fetch(`/api/groups/<%= groupId %>/remove/${userId}`, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        showMessage(data.error, 'error');
+                        return;
+                    }
+                    window.location.reload();
+                })
+                .catch(err => {
+                    console.error("Error:", err)
+                });
+            }
+
+            async function deleteGroup() {
+                fetch(`/api/groups/<%= groupId %>/delete`, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        showMessage(data.error, 'error');
+                        return;
+                    }
+                    window.location.href = "/";
+                })
+                .catch(err => {
+                    console.error("Error:", err);
+                });
+            }
         </script>
     </body>
 </html>

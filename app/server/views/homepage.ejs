@@ -1,20 +1,52 @@
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <link rel="stylesheet" href="/styles/styles.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        <link rel="preload" href="/fonts/mex_font.otf" as="font" type="font/otf" crossorigin />
         <title>Album Collector</title>
     </head>
-    <body>
-        <span class="home-title">Album Collector</span>
-        <br>
-        <span class="home-title">Welcome <%= username %></span>
-        <br>
-        <button id="collectionButton" type="button" class="home-button home-collection">My Collection</button>
-        <br>
-        <button id="joinGroupButton" type="button" class="home-button home-joingroup">Join Group</button>
-        <br>
-        <button id="createGroupButton" type="button" class="home-button home-creategroup">Create Group</button>
-        <br>
-        <button id="logoutButton" type="button" class="home-button home-logout">Logout</button>
+    <body class="home-page">
+        <header class="home-header">
+            <div class="home-header-text">
+                <span class="home-title">Album Collector</span>
+                <span class="home-welcome">Welcome <%= username %></span>
+            </div>
+            <button id="logoutButton" type="button" class="home-button home-logout">Logout</button>
+        </header>
+
+        <main class="home-layout">
+            <section class="home-actions">
+                <button id="collectionButton" type="button" class="home-button home-collection">My Collection</button>
+                <button id="joinGroupButton" type="button" class="home-button home-joingroup">Join Group</button>
+                <button id="createGroupButton" type="button" class="home-button home-creategroup">Create Group</button>
+            </section>
+
+            <section class="home-groups">
+                <span class="home-groups-heading">Groups</span>
+                <div class="home-groups-scroll">
+                    <% groups.forEach(function(group) { %>
+                        <button
+                            type="button"
+                            class="home-button home-group"
+                            data-group-id="<%= group.id %>"
+                            data-group-role="<%= group.role %>"
+                        >
+                            <span class="home-group-name"><%= group.name %></span>
+                            <span class="home-group-role home-group-role--<%= group.role === 'admin' ? 'admin' : 'member' %>">
+                                <%= group.role === 'admin' ? 'Admin' : 'Member' %>
+                            </span>
+                        </button>
+                    <% }) %>
+                    <% if (groups.length === 0) { %>
+                        <span class="home-groups-empty">You're not in any groups yet.</span>
+                    <% } %>
+                </div>
+            </section>
+        </main>
+
         <script>
             document.getElementById("collectionButton").addEventListener("click", function () {
                 window.location.href = "/collection";
@@ -29,22 +61,6 @@
                 window.location.href = "/auth/logout";
             });
         </script>
-        <span class="subtitle">Groups</span>
-        <% groups.forEach(function(group) { %>
-            <br>
-            <button
-                type="button"
-                class="home-button home-group"
-                data-group-id="<%= group.id %>"
-                data-group-role="<%= group.role %>"
-            >
-                <%= group.name %> · <%= group.role === 'admin' ? 'Admin' : 'Member' %>
-            </button>
-        <% }) %>
-        <% if (groups.length === 0) { %>
-            <br>
-            <span class="subtitle">You're not in any groups yet.</span>
-        <% } %>
 
         <script>
             document.querySelectorAll('.home-group').forEach(function(btn) {

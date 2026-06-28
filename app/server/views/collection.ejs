@@ -1,56 +1,154 @@
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <link rel="stylesheet" href="/styles/styles.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        <link rel="stylesheet" href="/vendor/flag-icons/css/flag-icons.min.css" />
+        <link rel="preload" href="/fonts/mex_font.otf" as="font" type="font/otf" crossorigin />
         <title>Album Collector</title>
     </head>
-    <body>
+    <body class="collection-page">
+        <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+        <header class="app-header">
+            <a href="/" class="page-home-link">← Home</a>
+            <a href="/" class="app-header-title">Album Collector</a>
+            <a href="/auth/logout" class="app-header-logout">Logout</a>
+        </header>
+
         <span class="subpage-title">My Collection</span>
-        <br>
 
         <div id="collection-data" data-collection="<%= stickersJson %>" style="display:none"></div>
 
-        <% 
+        <%
             let currentSection = null;
+
+            // Presentational only: maps a section name to its ISO 3166-1 alpha-2 flag code.
+            const sectionFlags = {
+                'Algeria': 'dz',
+                'Argentina': 'ar',
+                'Australia': 'au',
+                'Austria': 'at',
+                'Belgium': 'be',
+                'Bosnia and Herzegovina': 'ba',
+                'Brazil': 'br',
+                'Canada': 'ca',
+                "Côte d'Ivoire": 'ci',
+                'DR Congo': 'cd',
+                'Colombia': 'co',
+                'Cape Verde': 'cv',
+                'Croatia': 'hr',
+                'Curaçao': 'cw',
+                'Czechia': 'cz',
+                'Ecuador': 'ec',
+                'Egypt': 'eg',
+                'England': 'gb-eng',
+                'Spain': 'es',
+                'France': 'fr',
+                'Germany': 'de',
+                'Ghana': 'gh',
+                'Haiti': 'ht',
+                'Iran': 'ir',
+                'Iraq': 'iq',
+                'Jordan': 'jo',
+                'Japan': 'jp',
+                'South Korea': 'kr',
+                'Saudi Arabia': 'sa',
+                'Morocco': 'ma',
+                'Mexico': 'mx',
+                'Netherlands': 'nl',
+                'Norway': 'no',
+                'New Zealand': 'nz',
+                'Panama': 'pa',
+                'Paraguay': 'py',
+                'Portugal': 'pt',
+                'Qatar': 'qa',
+                'South Africa': 'za',
+                'Scotland': 'gb-sct',
+                'Senegal': 'sn',
+                'Switzerland': 'ch',
+                'Sweden': 'se',
+                'Tunisia': 'tn',
+                'Turkey': 'tr',
+                'Uruguay': 'uy',
+                'United States': 'us',
+                'Uzbekistan': 'uz'
+            };
+
+            const sectionIcons = {
+                'Intro': 'intro',
+                'World Cup History': 'history',
+                'Coke / Coca Cola': 'special'
+            };
         %>
 
         <% stickers.forEach(sticker => { %>
             <% if (sticker.section !== currentSection) { %>
-                <% if (currentSection !== null) { %></ul><% } %>
+                <% if (currentSection !== null) { %></ul></details><% } %>
                 <% currentSection = sticker.section %>
-                <br>
-                <span class="subtitle"><%= sticker.section %></span>
-                <ul>
+                <% const sectionFlag = sectionFlags[sticker.section]; %>
+                <% const sectionIcon = sectionIcons[sticker.section]; %>
+                <details class="collection-section">
+                    <summary class="collection-section-summary">
+                        <span class="section-label">
+                            <% if (sectionFlag) { %>
+                                <span class="fi fi-<%= sectionFlag %> section-flag"></span>
+                            <% } else if (sectionIcon) { %>
+                                <span class="section-flag section-icon section-icon--<%= sectionIcon %>"></span>
+                            <% } %>
+                            <%= sticker.section %>
+                        </span>
+                    </summary>
+                    <ul class="collection-list">
             <% } %>
 
-            <li>
-                <strong><%= sticker.sticker_code %></strong> — <%= sticker.name %> (<%= sticker.sticker_type %>)
-                &nbsp;
-                <label>
-                    <input
-                        type="checkbox"
-                        class="needs-checkbox"
-                        data-id="<%= sticker.id %>"
-                        <%= !sticker.needs ? 'checked' : '' %>
-                    /> Have it
-                </label>
-                &nbsp;
-                <span class="counter-wrap" id="counter-<%= sticker.id %>" data-needs="<%= sticker.needs %>">
-                    <button class="dec-btn" data-id="<%= sticker.id %>">-</button>
-                    <span id="val-<%= sticker.id %>"><%= sticker.duplicates_amount %></span>
-                    <button class="inc-btn" data-id="<%= sticker.id %>">+</button>
-                    extras
+            <li class="collection-item">
+                <span class="collection-item-info">
+                    <strong class="collection-item-code"><%= sticker.sticker_code %></strong>
+                    <span class="collection-item-name"><%= sticker.name %></span>
+                    <span class="collection-item-type"><%= sticker.sticker_type %></span>
+                </span>
+                <span class="collection-item-controls">
+                    <label class="collection-have">
+                        <input
+                            type="checkbox"
+                            class="needs-checkbox"
+                            data-id="<%= sticker.id %>"
+                            <%= !sticker.needs ? 'checked' : '' %>
+                        /> Have it
+                    </label>
+                    <span class="counter-wrap" id="counter-<%= sticker.id %>" data-needs="<%= sticker.needs %>">
+                        <button class="dec-btn" data-id="<%= sticker.id %>">−</button>
+                        <span id="val-<%= sticker.id %>" class="counter-val"><%= sticker.duplicates_amount %></span>
+                        <button class="inc-btn" data-id="<%= sticker.id %>">+</button>
+                        <span class="counter-label">extras</span>
+                    </span>
                 </span>
             </li>
         <% }) %>
 
-        <% if (currentSection !== null) { %></ul><% } %>
+        <% if (currentSection !== null) { %></ul></details><% } %>
 
-        <br>
-        <button id="save-btn">Save</button>
+        <div class="collection-save-bar">
+            <button id="save-btn" class="collection-button">Save</button>
+        </div>
 
         <script>
             const state = JSON.parse(document.getElementById('collection-data').dataset.collection);
             const dirty = new Set();
+
+            let toastTimer;
+            function showMessage(text, type = 'info') {
+                const toast = document.getElementById('toast');
+                toast.textContent = text;
+                toast.className = 'toast toast-' + type + ' toast-show';
+                clearTimeout(toastTimer);
+                toastTimer = setTimeout(() => {
+                    toast.className = 'toast toast-' + type;
+                }, 3000);
+            }
 
             document.querySelectorAll('.counter-wrap').forEach(counter => {
                 if (counter.dataset.needs === '1') {
@@ -96,7 +194,7 @@
             }
 
             async function saveCollection() {
-                if (dirty.size === 0) { alert('No changes to save.'); return; }
+                if (dirty.size === 0) { showMessage('No changes to save.', 'info'); return; }
 
                 const updates = [...dirty].map(id => ({
                     sticker_id: parseInt(id),
@@ -111,9 +209,9 @@
                 })
                 .then(res => res.json())
                 .then(data => {
-                    if (data.error) { alert(data.error); return; }
+                    if (data.error) { showMessage(data.error, 'error'); return; }
                     dirty.clear();
-                    alert('Collection saved!');
+                    showMessage('Collection saved!', 'success');
                 })
                 .catch(err => console.error('Error:', err));
             }

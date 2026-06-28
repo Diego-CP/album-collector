@@ -1,12 +1,18 @@
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <link rel="stylesheet" href="/styles/styles.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+        <link rel="preload" href="/fonts/mex_font.otf" as="font" type="font/otf" crossorigin />
         <title>Album Collector</title>
     </head>
-    <body>
-        <span class="signin-title">Album Collector</span>
-        <br>
-        <button id="signinButton" type="button" class="signin-button">Sign In or Create Account</button>
+    <body class="signin-page">
+        <main class="signin-card">
+            <span class="signin-title">Album Collector</span>
+            <button id="signinButton" type="button" class="signin-button">Sign In or Create Account</button>
+        </main>
         <script>
             document.getElementById("signinButton").addEventListener("click", function () {
                 const redirect = encodeURIComponent("<%= cognitoRedirectUri %>");

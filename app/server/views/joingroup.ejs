@@ -1,28 +1,57 @@
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <link rel="stylesheet" href="/styles/styles.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        <link rel="preload" href="/fonts/mex_font.otf" as="font" type="font/otf" crossorigin />
         <title>Album Collector</title>
     </head>
-    <body>
-        <span class="subpage-title">Join Group</span>
-        <br>
-        <form id="joinGroupForm">
-            <label for="gcode">Group code:</label>
-            <input type="text" id="gcode" name="gcode" maxlength="7" minlength="7" required>
-            <br><br>
-            <input type="submit" value="Search & Join">
-        </form>
+    <body class="form-page">
+        <a href="/" class="page-home-link">← Home</a>
+        <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+        <main class="form-card">
+            <span class="subpage-title">Join Group</span>
+            <form id="joinGroupForm" class="form-body">
+                <label for="gcode" class="form-label">Group code</label>
+                <input
+                    type="text"
+                    id="gcode"
+                    name="gcode"
+                    class="form-input code-input"
+                    maxlength="7"
+                    minlength="7"
+                    placeholder="ABC1234"
+                    required
+                >
+                <input type="submit" class="form-submit" value="Search &amp; Join">
+            </form>
+        </main>
+
         <script>
+            let toastTimer;
+            function showMessage(text, type = 'info') {
+                const toast = document.getElementById('toast');
+                toast.textContent = text;
+                toast.className = 'toast toast-' + type + ' toast-show';
+                clearTimeout(toastTimer);
+                toastTimer = setTimeout(() => {
+                    toast.className = 'toast toast-' + type;
+                }, 3000);
+            }
+
             document.getElementById("joinGroupForm").addEventListener("submit", function (e) {
                 e.preventDefault(); // stops the form from reloading the page
 
                 const groupCode = document.getElementById("gcode").value.trim();
 
                 if (!groupCode) {
-                    alert("Please enter a group code.");
+                    showMessage("Please enter a group code.", "error");
                     return;
                 } else if (groupCode.length > 7) {
-                    alert("Group codes are 7 characters long.");
+                    showMessage("Group codes are 7 characters long.", "error");
                     return;
                 }
 
@@ -34,7 +63,7 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.error) {
-                        alert(data.error);
+                        showMessage(data.error, "error");
                         return;
                     }
                     console.log("Redirecting to group:", data.groupId);

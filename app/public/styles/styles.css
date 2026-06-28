@@ -1,62 +1,1001 @@
-/* Custom styles can be added to this file */
+/* ============================================================
+   Fonts & theme tokens
+   ============================================================ */
+@font-face {
+    font-family: 'Mexico86';
+    src: url('/fonts/mex_font.otf') format('opentype');
+    font-display: swap;
+}
 
-/* Common styles across pages */
+:root {
+    --display-font: 'Mexico86', system-ui, sans-serif;
+    --body-font: 'Inter', system-ui, sans-serif;
+    --bg: #f7f6f2;
+    --ink: #14213d;
+    --bold-blue: #1338be;
+    --bold-red: #d62828;
+}
+
+/* ============================================================
+   Shared across pages
+   ============================================================ */
+
+/* Titles (every subpage; .subtitle also base for group/section headings) */
 .subpage-title {
-    font-size: 50px;
-    color: darkblue;
+    font-family: var(--display-font);
+    font-size: clamp(40px, 7vw, 84px);
+    line-height: 0.95;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--bold-blue);
 }
 
 .subtitle {
     font-size: 20px;
 }
 
-/* Sign In page styles */
+/* App header / top nav (collection & group pages) */
+.app-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 16px;
+    /* negative margins cancel the page's top + side padding so the bar is full-width */
+    margin: -24px calc(clamp(16px, 4vw, 48px) * -1) 28px;
+    /* internal padding re-aligns the bar's content with the page content below it */
+    padding: 16px clamp(16px, 4vw, 48px);
+    background-color: #ffffff;
+    border-bottom: 2px solid var(--ink);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.app-header::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 100%;
+    height: 100vh;
+    background-color: #ffffff;
+}
+
+.app-header-title {
+    grid-column: 2;
+    font-family: var(--display-font);
+    font-size: clamp(20px, 4vw, 36px);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--bold-blue);
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.15s ease;
+}
+
+.app-header-title:hover {
+    color: var(--ink);
+}
+
+.app-header-logout {
+    grid-column: 3;
+    justify-self: end;
+    font-family: var(--body-font);
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+    background-color: var(--bold-red);
+    border: none;
+    border-radius: 12px;
+    padding: 12px 22px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.app-header-logout:hover {
+    background-color: #b51f1f;
+    transform: translateY(-2px);
+}
+
+.page-home-link {
+    font-family: var(--body-font);
+    font-size: 18px;
+    font-weight: 600;
+    color: #9ca3af;
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.page-home-link:hover {
+    color: #6b7280;
+}
+
+.app-header .page-home-link {
+    grid-column: 1;
+    justify-self: start;
+}
+
+/* Toast notifications (collection, group, and form pages) */
+.toast {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translate(-50%, -20px);
+    z-index: 1000;
+    max-width: 90vw;
+    padding: 14px 28px;
+    border-radius: 999px;
+    font-family: var(--body-font);
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.toast-show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+.toast-info {
+    background-color: var(--ink);
+}
+
+.toast-success {
+    background-color: #00a500;
+}
+
+.toast-error {
+    background-color: #d62828;
+}
+
+/* ============================================================
+   Sign In page
+   ============================================================ */
+.signin-page {
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background-color: var(--bg);
+    font-family: var(--body-font);
+}
+
+.signin-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 36px;
+    text-align: center;
+}
+
 .signin-title {
-    font-size: 50px;
+    font-family: var(--display-font);
+    font-size: clamp(56px, 12vw, 130px);
+    line-height: 0.92;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--bold-blue);
 }
 
 .signin-button {
-    background-color: burlywood;
+    font-family: var(--body-font);
+    font-size: 18px;
+    font-weight: 600;
+    color: #ffffff;
+    background-color: var(--bold-red);
+    border: none;
+    border-radius: 999px;
+    padding: 16px 44px;
+    cursor: pointer;
+    transition: transform 0.15s ease, background-color 0.15s ease;
 }
 
-/* Home page styles */
+.signin-button:hover {
+    background-color: #b51f1f;
+    transform: translateY(-2px);
+}
+
+.signin-button:active {
+    transform: translateY(0);
+}
+
+/* ============================================================
+   Home page
+   ============================================================ */
+.home-page {
+    min-height: 100vh;
+    margin: 0;
+    padding: 24px clamp(16px, 4vw, 48px) 48px;
+    box-sizing: border-box;
+    background-color: var(--bg);
+    font-family: var(--body-font);
+    color: var(--ink);
+}
+
+.home-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+}
+
+.home-header-text {
+    display: flex;
+    flex-direction: column;
+}
+
 .home-title {
-    font-size: 80px;
-    color: red;
+    font-family: var(--display-font);
+    font-size: clamp(40px, 7vw, 84px);
+    line-height: 0.95;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--bold-blue);
 }
 
+.home-welcome {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-top: 8px;
+}
+
+.home-layout {
+    display: flex;
+    gap: clamp(20px, 4vw, 48px);
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.home-actions {
+    flex: 1 1 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.home-groups {
+    flex: 1 1 320px;
+    display: flex;
+    flex-direction: column;
+    height: 60vh;
+    background-color: #ffffff;
+    border: 2px solid var(--ink);
+    border-radius: 18px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+    .home-groups {
+        height: calc(100vh - 200px);
+    }
+}
+
+.home-groups-heading {
+    font-family: var(--display-font);
+    font-size: 28px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin-bottom: 16px;
+}
+
+.home-groups-scroll {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-right: 6px;
+}
+
+.home-groups-empty {
+    font-size: 16px;
+    color: #6b7280;
+}
+
+/* Button base */
 .home-button {
-    font-size: 10px;
+    font-family: var(--body-font);
+    font-size: 18px;
+    font-weight: 600;
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    padding: 18px 24px;
+    cursor: pointer;
+    text-align: left;
+    transition: transform 0.15s ease, filter 0.15s ease;
 }
 
+.home-button:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+}
+
+.home-button:active {
+    transform: translateY(0);
+}
+
+/* Action button colors */
 .home-collection {
-    background-color: cyan;
+    background-color: var(--bold-blue);
 }
 
 .home-joingroup {
-    background-color: yellow;
+    background-color: #2a9d8f;
 }
 
 .home-creategroup {
-    background-color: green;
+    background-color: #e76f51;
 }
 
 .home-logout {
-    background-color: red;
+    background-color: var(--bold-red);
+    font-size: 15px;
+    padding: 12px 22px;
+    flex: 0 0 auto;
 }
 
-/* Create Account page styles */
-.create-button {
-    background-color: pink;
+/* Group buttons (name + role badge) */
+.home-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    flex: 0 0 auto;
+    background-color: var(--ink);
 }
 
-/* Collection page styles */
+.home-group-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.home-group-role {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    flex: 0 0 auto;
+}
+
+.home-group-role--admin {
+    background-color: var(--bold-blue);
+    color: #ffffff;
+}
+
+.home-group-role--member {
+    background-color: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+}
+
+/* ============================================================
+   Collection page
+   ============================================================ */
+.collection-page {
+    min-height: 100vh;
+    margin: 0;
+    padding: 24px clamp(16px, 4vw, 48px) 120px;
+    box-sizing: border-box;
+    background-color: var(--bg);
+    font-family: var(--body-font);
+    color: var(--ink);
+}
+
+.collection-page .subpage-title {
+    display: block;
+    margin-bottom: 28px;
+}
+
+/* Section dropdowns */
+.collection-section {
+    background-color: #ffffff;
+    border: 2px solid var(--ink);
+    border-radius: 14px;
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+
+.collection-section-summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 18px 22px;
+    font-family: var(--display-font);
+    font-size: 24px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+}
+
+.collection-section-summary::-webkit-details-marker {
+    display: none;
+}
+
+.collection-section-summary::after {
+    content: "▾";
+    font-family: var(--body-font);
+    font-size: 20px;
+    transition: transform 0.2s ease;
+}
+
+.collection-section[open] .collection-section-summary::after {
+    transform: rotate(180deg);
+}
+
+.collection-section[open] .collection-section-summary {
+    border-bottom: 2px solid var(--bg);
+}
+
+/* Section header: flag/icon + name */
+.section-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.section-flag {
+    width: 34px;
+    height: 24px;
+    border-radius: 3px;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12);
+    flex: 0 0 auto;
+}
+
+.section-icon {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 18px;
+}
+
+.section-icon--intro {
+    background-color: var(--bold-blue);
+    background-image: url('/icons/star.svg');
+}
+
+.section-icon--history {
+    background-color: #e9b500;
+    background-image: url('/icons/trophy.svg');
+}
+
+.section-icon--special {
+    background-color: var(--bold-red);
+    background-image: url('/icons/drink.svg');
+}
+
+/* Sticker list */
+.collection-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.collection-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 14px 22px;
+    border-top: 1px solid #eee;
+}
+
+.collection-item:first-child {
+    border-top: none;
+}
+
+.collection-item-info {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.collection-item-code {
+    color: var(--bold-blue);
+    font-weight: 700;
+}
+
+.collection-item-name {
+    font-weight: 500;
+}
+
+.collection-item-type {
+    font-size: 13px;
+    color: #6b7280;
+    background-color: #f0f0ef;
+    padding: 2px 10px;
+    border-radius: 999px;
+}
+
+.collection-item-controls {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.collection-have {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 15px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* Duplicate counter */
+.counter-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.inc-btn,
+.dec-btn {
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 50%;
+    background-color: var(--ink);
+    color: #ffffff;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    transition: filter 0.15s ease;
+}
+
+.inc-btn:hover,
+.dec-btn:hover {
+    filter: brightness(1.25);
+}
+
+.counter-val {
+    min-width: 22px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--ink);
+}
+
+/* Sticky save bar */
+.collection-save-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px clamp(16px, 4vw, 48px);
+    background: linear-gradient(to top, var(--bg) 70%, transparent);
+    pointer-events: none;
+}
+
 .collection-button {
-    background-color: lightgrey;
+    pointer-events: auto;
+    font-family: var(--body-font);
+    font-size: 18px;
+    font-weight: 600;
+    color: #ffffff;
+    background-color: var(--bold-red);
+    border: none;
+    border-radius: 999px;
+    padding: 14px 48px;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+    transition: transform 0.15s ease, background-color 0.15s ease;
 }
 
-/* Edit Collection page styles */
+.collection-button:hover {
+    background-color: #b51f1f;
+    transform: translateY(-2px);
+}
 
-/* Join Group page styles */
+.collection-button:active {
+    transform: translateY(0);
+}
 
-/* Create Group page styles */
+/* ============================================================
+   Group pages (member & admin views)
+   ============================================================ */
+.group-page {
+    min-height: 100vh;
+    margin: 0;
+    padding: 24px clamp(16px, 4vw, 48px) 100px;
+    box-sizing: border-box;
+    background-color: var(--bg);
+    font-family: var(--body-font);
+    color: var(--ink);
+}
+
+.group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 36px;
+}
+
+.group-header .subpage-title {
+    display: block;
+}
+
+/* Invite code callout */
+.invite-chip {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background-color: var(--bold-blue);
+    color: #ffffff;
+    padding: 12px 22px;
+    border-radius: 14px;
+    flex: 0 0 auto;
+}
+
+.invite-chip-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.85;
+}
+
+.invite-chip-code {
+    font-family: ui-monospace, "Cascadia Code", "Courier New", monospace;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.group-section {
+    margin-bottom: 36px;
+}
+
+.group-section-heading {
+    display: block;
+    font-family: var(--display-font);
+    font-size: 28px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin-bottom: 16px;
+}
+
+/* Members */
+.member-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.member-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    background-color: #ffffff;
+    border: 2px solid var(--ink);
+    border-radius: 12px;
+    padding: 12px 18px;
+}
+
+.member-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.member-name {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.member-role {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    width: fit-content;
+    margin-top: 2px;
+}
+
+.member-role--admin {
+    background-color: var(--bold-blue);
+    color: #ffffff;
+}
+
+.member-role--member {
+    background-color: #f0f0ef;
+    color: #6b7280;
+}
+
+.member-remove-btn {
+    font-family: var(--body-font);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--bold-red);
+    background-color: transparent;
+    border: 1.5px solid var(--bold-red);
+    border-radius: 999px;
+    padding: 6px 16px;
+    cursor: pointer;
+    flex: 0 0 auto;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.member-remove-btn:hover {
+    background-color: var(--bold-red);
+    color: #ffffff;
+}
+
+/* Status notices */
+.notice {
+    margin: 0;
+    padding: 16px 20px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    background-color: #ffffff;
+    border: 2px solid #e5e5e5;
+    color: var(--ink);
+}
+
+.notice--error {
+    border-color: var(--bold-red);
+    color: var(--bold-red);
+}
+
+.notice--info {
+    border-color: var(--bold-blue);
+    color: var(--bold-blue);
+}
+
+/* Trades */
+.trade-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.trade-card {
+    background-color: #ffffff;
+    border: 2px solid var(--ink);
+    border-radius: 16px;
+    padding: 18px 22px;
+}
+
+.trade-card-title {
+    display: block;
+    font-family: var(--display-font);
+    font-size: 20px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--bold-blue);
+    margin-bottom: 12px;
+}
+
+.trade-steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.trade-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: 15px;
+}
+
+.trade-user {
+    font-weight: 600;
+    background-color: var(--bg);
+    padding: 4px 12px;
+    border-radius: 999px;
+}
+
+.trade-arrow {
+    color: var(--bold-blue);
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.trade-sticker {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.trade-code {
+    font-family: ui-monospace, "Cascadia Code", "Courier New", monospace;
+    font-size: 13px;
+    color: #6b7280;
+    background-color: #f0f0ef;
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+/* Footer actions (Leave / Delete) */
+.group-footer {
+    margin-top: 8px;
+}
+
+.group-leave-btn {
+    font-family: var(--body-font);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--bold-red);
+    background-color: transparent;
+    border: 2px solid var(--bold-red);
+    border-radius: 999px;
+    padding: 12px 32px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.group-leave-btn:hover {
+    background-color: var(--bold-red);
+    color: #ffffff;
+}
+
+.group-delete-btn {
+    font-family: var(--body-font);
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    background-color: var(--bold-red);
+    border: none;
+    border-radius: 999px;
+    padding: 12px 32px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.group-delete-btn:hover {
+    background-color: #b51f1f;
+    transform: translateY(-2px);
+}
+
+/* ============================================================
+   Form pages (Join Group, Create Group, Change Username)
+   ============================================================ */
+.form-page {
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    box-sizing: border-box;
+    background-color: var(--bg);
+    font-family: var(--body-font);
+    color: var(--ink);
+}
+
+.form-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    width: 100%;
+    max-width: 440px;
+    text-align: center;
+}
+
+.form-card .subpage-title {
+    display: block;
+}
+
+.form-body {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    width: 100%;
+    background-color: #ffffff;
+    border: 2px solid var(--ink);
+    border-radius: 18px;
+    padding: 32px;
+    box-sizing: border-box;
+}
+
+.form-label {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #6b7280;
+    text-align: left;
+}
+
+.form-input {
+    font-family: var(--body-font);
+    font-size: 18px;
+    color: var(--ink);
+    background-color: var(--bg);
+    border: 2px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 14px 18px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--bold-blue);
+}
+
+.form-page .page-home-link {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 10;
+}
+
+/* Group-code field (Join Group) */
+.code-input {
+    font-family: ui-monospace, "Cascadia Code", "Courier New", monospace;
+    font-size: 24px;
+    letter-spacing: 6px;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.code-input::placeholder {
+    color: #c4c4c4;
+    letter-spacing: 6px;
+}
+
+.form-submit {
+    font-family: var(--body-font);
+    font-size: 18px;
+    font-weight: 600;
+    color: #ffffff;
+    background-color: var(--bold-red);
+    border: none;
+    border-radius: 999px;
+    padding: 16px 32px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.form-submit:hover {
+    background-color: #b51f1f;
+    transform: translateY(-2px);
+}
+
+.form-submit:active {
+    transform: translateY(0);
+}
