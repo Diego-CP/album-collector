@@ -4,13 +4,13 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const db = require('../db');
 
-router.get('/callback', async function(req, res) {
+router.get('/callback', async function(req, res) {    
     const { code, state } = req.query;
 
     const storedState = req.cookies?.oauth_state;
 
     if (!code || !state || state !== storedState) {
-        return res.redirect('/signin');
+        return res.redirect('/public/signin');
     }
 
     // Clear the state cookie immediately so it can't be reused

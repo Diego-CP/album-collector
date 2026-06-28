@@ -7,8 +7,13 @@ router.get('/signin', function(req, res){
         return res.redirect('/');
     }
     
-    const state = require('crypto').randomUUID();
-    res.cookie('oauth_state', state, { httpOnly: true, sameSite: 'lax' });
+    const state = req.cookies?.oauth_state || require('crypto').randomUUID();
+    res.cookie('oauth_state', state, { 
+        httpOnly: true, 
+        sameSite: 'lax',
+        maxAge: 10 * 60 * 1000 // 10 minutes
+    });
+
     res.render('signin', {
         cognitoDomain: process.env.COGNITO_DOMAIN,
         cognitoClientId: process.env.COGNITO_CLIENT_ID,
