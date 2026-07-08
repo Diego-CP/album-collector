@@ -32,3 +32,9 @@ variable "az_count" {
     error_message = "az_count must be between 2 and 4 (region AZ availability permitting)."
   }
 }
+
+variable "enable_nat" {
+  type        = bool
+  default     = true
+  description = "Create NAT gateways or not. Set false to drop NAT (the main idle cost)."
+}

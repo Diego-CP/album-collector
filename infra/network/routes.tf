@@ -27,9 +27,9 @@ resource "aws_route_table" "private" {
   tags   = { Name = "${var.project}-private-rt-${local.azs[count.index]}" }
 }
 
-# Default route to corresponding NAT Gateway
+# Default route to corresponding NAT Gateway (if available)
 resource "aws_route" "private_default" {
-  count                  = var.az_count
+  count                  = var.enable_nat ? var.az_count : 0
   route_table_id         = aws_route_table.private[count.index].id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = aws_nat_gateway.this[count.index].id
