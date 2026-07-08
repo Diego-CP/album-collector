@@ -1,5 +1,4 @@
 ### Intellij ###
-
 *.iml
 
 ## Directory-based project format:
@@ -57,3 +56,25 @@ node_modules
 
 # Environment variables
 .env
+
+### Terraform ###
+# Local state (bootstrap uses this) - can contain secrets in plaintext
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# Provider plugins and local working dir
+.terraform/
+.terraform.tfstate.lock.info
+
+# Crash logs
+crash.log
+crash.*.log
+
+# Variable files that may hold secrets
+*.tfvars
+*.tfvars.json
+!example.tfvars
+
+# Intentionally NOT ignored here — it pins provider versions for reproducible runs
+# .terraform.lock.hcl

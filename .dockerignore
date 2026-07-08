@@ -1,7 +1,28 @@
+# Dependencies
 node_modules
-npm-debug.log
-Dockerfile
-.dockerignore
+npm-debug.log*
+
+# Secrets
+.env.*
+
+# VCS
 .git
 .gitignore
+
+# Docker/build files
+Dockerfile
 docker-compose.yml
+.dockerignore
+
+# Test, build, infra, and log artifacts
+coverage
+dist
+build
+*.log
+infra/
+tests/
+*.tfstate
+*.tfstate.*
+
+# Docs
+*.md

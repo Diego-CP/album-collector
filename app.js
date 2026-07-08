@@ -22,6 +22,9 @@ app.use('/auth', require('./app/server/routes/authentication'));
 // Public pages
 app.use('/public', require('./app/server/routes/publicpages'));
 
+// Health check routes
+app.use('/health', require('./app/server/routes/health'));
+
 app.use(authenticateToken);
 
 // Protected routes:

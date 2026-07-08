@@ -1,8 +1,44 @@
 services:
   app:
-    container_name: app
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
     ports:
       - "3000:3000"
+    env_file:
+      - ./app/.env
+    environment:
+      # DB is reached by service name, so localhost points at itself
+      # Override it
+      DB_HOST: db
+      DATABASE_URL: mysql://${DB_USER}:${DB_PASSWORD}@db:3306/${DB_NAME}
+      # For local dev
+      NODE_ENV: dev
+      PORT: 3000
+    depends_on:
+      db:
+        # Don't start app until MySQL passes its healthcheck
+        condition: service_healthy 
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpw}
+    ports:
+      - "3306:3306"
+    volumes:
+      # Persists data across up/down
+      - db_data:/var/lib/mysql
+    healthcheck:
+      # $$ Escapes the $ from compose's own interpolation
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$$MYSQL_ROOT_PASSWORD --silent || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+volumes:
+  db_data:

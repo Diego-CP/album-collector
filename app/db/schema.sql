@@ -15,7 +15,7 @@ SET @@SESSION.SQL_LOG_BIN= 0;
 -- GTID state at the beginning of the backup
 --
 
-SET @@GLOBAL.GTID_PURGED=/*!80000 '+'*/ '14547304-4a83-11f1-be1a-0a37f424d8cc:1-429';
+SET @@GLOBAL.GTID_PURGED=/*!80000 '+'*/ '14547304-4a83-11f1-be1a-0a37f424d8cc:1-470';
 
 --
 -- Table structure for table `collection`
