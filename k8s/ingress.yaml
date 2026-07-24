@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: album-collector
+  namespace: album-collector
+  annotations:
+    # internet-facing for public ALB
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    # ALB targets pod IPs directly
+    alb.ingress.kubernetes.io/target-type: ip
+    # TODO: Change to HTTPS
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+    alb.ingress.kubernetes.io/healthcheck-path: /health/ready
+spec:
+  ingressClassName: alb
+  rules:
+    - http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: album-collector
+                port:
+                  number: 80
