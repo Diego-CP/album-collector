@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: album-collector
+data:
+  # NODE_ENV=production makes the auth cookie set Secure=true (login over HTTPS)
+  # Health endpoints don't set cookies, so port-forward validation (w/HTTP) is unaffected
+  NODE_ENV: "production"
+  PORT: "3000"
+  AWS_REGION: "us-east-1"
+
+  # Aurora write volume endpoint
+  DB_HOST: "album-collector-aurora.cluster-czpkztbb34ed.us-east-1.rds.amazonaws.com"
+  DB_NAME: "albumcollector"
+  DB_USER: "dbadmin"
+
+  COGNITO_USER_POOL_ID: "us-east-1_aa3rS34uN"
+  COGNITO_CLIENT_ID: "1rlik54mh3fb2q6peqboq828hh"
+  COGNITO_DOMAIN: "https://us-east-1aa3rs34un.auth.us-east-1.amazoncognito.com"
+  # TODO: Replance in prod
+  COGNITO_REDIRECT_URI: "http://localhost:3000/auth/callback"
+  COGNITO_LOGOUT_URI: "http://localhost:3000/public/signin"

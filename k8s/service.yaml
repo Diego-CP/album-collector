@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: album-collector
+  namespace: album-collector
+  labels:
+    app: album-collector
+spec:
+  # TODO: Change in prod. ClusterIP: internal
+  type: ClusterIP
+  selector:
+    app: album-collector
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP

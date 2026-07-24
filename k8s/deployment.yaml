@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: album-collector
+  namespace: album-collector
+  labels:
+    app: album-collector
+spec:
+  replicas: 2 # one per node - survives a single spot interruption
+  selector:
+    matchLabels:
+      app: album-collector
+  template:
+    metadata:
+      labels:
+        app: album-collector
+    spec:
+      securityContext:
+        runAsNonRoot: true # image runs as "node" user
+        runAsUser: 1000 # numeric UID of "node" user
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: app
+          image: 822902368026.dkr.ecr.us-east-1.amazonaws.com/album-collector:086c75a
+          ports:
+            - containerPort: 3000
+          # Pull keys from ConfigMap and Secret as env variables
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secrets
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          # liveness/readiness don't begin until this passes
+          startupProbe:
+            httpGet:
+              path: /health/live
+              port: 3000
+            periodSeconds: 5
+            failureThreshold: 30
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 3000
+            periodSeconds: 10
+            failureThreshold: 3
+          # Pod is not restarted on failure,
+          # it is held until the DB responds
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 3000
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
