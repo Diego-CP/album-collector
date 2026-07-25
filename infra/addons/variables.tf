@@ -16,10 +16,11 @@ variable "environment" {
 variable "lbc_chart_version" {
   type        = string
   default     = "1.14.0"
-  description = <<-EOT
-    AWS Load Balancer Controller Helm chart version. Check the latest compatible
-    version with:
-      helm repo add eks https://aws.github.io/eks-charts && helm repo update
-      helm search repo eks/aws-load-balancer-controller --versions
-  EOT
+  description = "Load Balancer Controller Helm chart version."
+}
+
+variable "external_dns_chart_version" {
+  type        = string
+  default     = "1.21.1"
+  description = "ExternalDNS Helm chart version."
 }

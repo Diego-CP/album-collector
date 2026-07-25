@@ -8,13 +8,17 @@ metadata:
     alb.ingress.kubernetes.io/scheme: internet-facing
     # ALB targets pod IPs directly
     alb.ingress.kubernetes.io/target-type: ip
-    # TODO: Change to HTTPS
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'
+    # Redirect http traffic to https
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:822902368026:certificate/4364a21b-9673-40f2-ac2c-fb881b19418f
     alb.ingress.kubernetes.io/healthcheck-path: /health/ready
 spec:
   ingressClassName: alb
   rules:
-    - http:
+    # ExternalDNS creates a Route 53 ALIAS record pointing it at the ALB
+    - host: album-collector.online
+      http:
         paths:
           - path: /
             pathType: Prefix

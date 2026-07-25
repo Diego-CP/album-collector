@@ -18,6 +18,5 @@ data:
   COGNITO_USER_POOL_ID: "us-east-1_aa3rS34uN"
   COGNITO_CLIENT_ID: "1rlik54mh3fb2q6peqboq828hh"
   COGNITO_DOMAIN: "https://us-east-1aa3rs34un.auth.us-east-1.amazoncognito.com"
-  # TODO: Replance in prod
-  COGNITO_REDIRECT_URI: "http://localhost:3000/auth/callback"
-  COGNITO_LOGOUT_URI: "http://localhost:3000/public/signin"
+  COGNITO_REDIRECT_URI: "https://album-collector.online/auth/callback"
+  COGNITO_LOGOUT_URI: "https://album-collector.online/public/signin"

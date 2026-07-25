@@ -16,6 +16,15 @@ data "terraform_remote_state" "network" {
   }
 }
 
+data "terraform_remote_state" "dns" {
+  backend = "s3"
+  config = {
+    bucket = "album-collector-tfstate-822902368026"
+    key    = "dns/terraform.tfstate"
+    region = "us-east-1"
+  }
+}
+
 data "aws_eks_cluster" "this" {
   name = data.terraform_remote_state.eks.outputs.cluster_name
 }
