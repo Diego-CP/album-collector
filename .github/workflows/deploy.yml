@@ -21,7 +21,7 @@ jobs:
   deploy:
     runs-on: ubuntu-24.04-arm # For Graviton instances
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7 # Latest (27 Jul 2026)
 
       # Tag by commit SHA
       - name: Compute image tag
@@ -29,19 +29,19 @@ jobs:
         run: echo "tag=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
 
       - name: Configure AWS credentials (OIDC)
-        uses: aws-actions/configure-aws-credentials@v6.2.3 # Latest
+        uses: aws-actions/configure-aws-credentials@v6.2.3 # Latest (27 Jul 2026)
         with:
           role-to-assume: arn:aws:iam::822902368026:role/album-collector-github-actions
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Log in to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v2
+        uses: aws-actions/amazon-ecr-login@v2 # Latest (27 Jul 2026)
 
       - name: Set up Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4.2.0 # Latest (27 Jul 2026)
 
       - name: Build and push image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7.3.0 # Latest (27 Jul 2026)
         with:
           context: .
           platforms: linux/arm64

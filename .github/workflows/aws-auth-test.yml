@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Assume AWS role via OIDC
-        uses: aws-actions/configure-aws-credentials@v6.2.3 # Latest
+        uses: aws-actions/configure-aws-credentials@v6.2.3 # Latest (27 Jul 2026)
         with:
           role-to-assume: arn:aws:iam::822902368026:role/album-collector-github-actions
           aws-region: us-east-1
