@@ -13,6 +13,22 @@ module "eks" {
   # EKS access entry, so kubectl is authorized immediately
   enable_cluster_creator_admin_permissions = true
 
+  # GitHub Actions role has Edit access in the namespace
+  access_entries = {
+    github_actions = {
+      principal_arn = data.terraform_remote_state.cicd.outputs.github_actions_role_arn
+      policy_associations = {
+        edit = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSEditPolicy"
+          access_scope = {
+            type       = "namespace"
+            namespaces = ["album-collector"]
+          }
+        }
+      }
+    }
+  }
+
   # before_compute = true installs networking/identity before nodes join
   addons = {
     coredns                = {}
