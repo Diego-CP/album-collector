@@ -6,7 +6,7 @@ metadata:
   labels:
     app: album-collector
 spec:
-  replicas: 2 # one per node - survives a single spot interruption
+  # replicas omitted, as the HPA owns the replica count
   selector:
     matchLabels:
       app: album-collector

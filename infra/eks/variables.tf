@@ -27,7 +27,8 @@ variable "node_ami_type" {
 
 variable "node_instance_types" {
   type        = list(string)
-  default     = ["t4g.medium", "t4g.large", "m6g.medium", "m7g.medium", "m6g.large"]
+  # All 1-vCPU / 4 GB arm64 mediums. Consistent shape for Cluster Autoscaler
+  default     = ["m6g.medium", "m7g.medium", "m8g.medium"]
   description = "Graviton instance types for the node group. Variety to widen Spot instance pool."
 }
 

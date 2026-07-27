@@ -27,3 +27,13 @@ output "security_group_id" {
   value       = aws_security_group.aurora.id
   description = "Aurora security group ID."
 }
+
+output "cognito_client_secret_arn" {
+  value       = aws_secretsmanager_secret.cognito_client.arn
+  description = "ARN of the Cognito client secret (ESO IRSA scope)."
+}
+
+output "cognito_client_secret_name" {
+  value       = aws_secretsmanager_secret.cognito_client.name
+  description = "Name of the Cognito client secret (ExternalSecret remoteRef key)."
+}

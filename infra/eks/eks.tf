@@ -17,7 +17,19 @@ module "eks" {
   addons = {
     coredns                = {}
     kube-proxy             = {}
-    vpc-cni                = { before_compute = true }
+    vpc-cni                = {
+      # Ensures the CNI is in prefix mode BEFORE nodes join
+      before_compute = true
+      # Prefix delegation: each ENI slot yields a /28 (16 IPs) instead of a single
+      # IP, lifting a node's pod ceiling from the ENI-limited default (as low as 8
+      # on m*g.medium instances) to ~100-110
+      configuration_values = jsonencode({
+        env = {
+          ENABLE_PREFIX_DELEGATION = "true"
+          WARM_PREFIX_TARGET       = "1"
+        }
+      })
+    }
     eks-pod-identity-agent = { before_compute = true }
   }
 

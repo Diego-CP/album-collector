@@ -40,4 +40,7 @@ resource "helm_release" "external_dns" {
     { name = "serviceAccount.name", value = "external-dns" },
     { name = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn", value = module.external_dns_irsa.iam_role_arn },
   ]
+
+  # Wait for LB controller to register the webhook
+  depends_on = [helm_release.lbc]
 }
