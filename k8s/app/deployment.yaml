@@ -22,7 +22,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: app
-          image: 822902368026.dkr.ecr.us-east-1.amazonaws.com/album-collector:086c75a
+          image: __IMAGE__
           ports:
             - containerPort: 3000
           # Pull keys from ConfigMap and Secret as env variables

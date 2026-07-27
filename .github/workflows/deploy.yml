@@ -3,6 +3,16 @@ name: Deploy
 on:
   push:
     branches: [main]
+    # Only run when something that affects the running app changed
+    paths:
+      - "app/**"
+      - "app.js"
+      - "package.json"
+      - "package-lock.json"
+      - "Dockerfile"
+      - "k8s/app/**"
+      - "k8s/migrate-job.yaml"
+      - ".github/workflows/deploy.yml"
   workflow_dispatch:
 
 # Grant OIDC permission to mint the token
@@ -61,8 +71,9 @@ jobs:
           kubectl -n "$NAMESPACE" wait --for=condition=complete job/db-migrate --timeout=300s \
             || { echo "== migration failed =="; kubectl -n "$NAMESPACE" logs job/db-migrate; exit 1; }
 
-      - name: Roll out new image
+      - name: Apply app manifests and roll out new image
         run: |
           IMAGE="$ECR_REGISTRY/$ECR_REPOSITORY:${{ steps.tag.outputs.tag }}"
-          kubectl -n "$NAMESPACE" set image deployment/album-collector app="$IMAGE"
+          for f in k8s/app/*.yaml; do sed "s|__IMAGE__|$IMAGE|g" "$f"; echo '---'; done \
+            | kubectl -n "$NAMESPACE" apply -f -
           kubectl -n "$NAMESPACE" rollout status deployment/album-collector --timeout=180s
