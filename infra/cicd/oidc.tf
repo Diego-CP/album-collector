@@ -28,8 +28,8 @@ data "aws_iam_policy_document" "assume" {
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      # any branch/ref in this repo
-      values = ["repo:${var.github_owner}/${var.github_repo}:*"]
+      # Only runs on the main branch may assume this role
+      values = ["repo:${var.github_owner}/${var.github_repo}:ref:refs/heads/main"]
     }
   }
 }
