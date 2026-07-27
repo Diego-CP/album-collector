@@ -1,0 +1,68 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Grant OIDC permission to mint the token
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REGISTRY: 822902368026.dkr.ecr.us-east-1.amazonaws.com
+  ECR_REPOSITORY: album-collector
+  CLUSTER_NAME: album-collector-eks
+  NAMESPACE: album-collector
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04-arm # For Graviton instances
+    steps:
+      - uses: actions/checkout@v4
+
+      # Tag by commit SHA
+      - name: Compute image tag
+        id: tag
+        run: echo "tag=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v6.2.3 # Latest
+        with:
+          role-to-assume: arn:aws:iam::822902368026:role/album-collector-github-actions
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/arm64
+          push: true
+          tags: ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ steps.tag.outputs.tag }}
+          provenance: false # keep it a single clean image
+
+      - name: Configure kubectl
+        run: aws eks update-kubeconfig --name "$CLUSTER_NAME" --region "$AWS_REGION"
+
+      # Migrations run in-cluster before the app rolls
+      - name: Run database migrations
+        run: |
+          IMAGE="$ECR_REGISTRY/$ECR_REPOSITORY:${{ steps.tag.outputs.tag }}"
+          kubectl -n "$NAMESPACE" delete job db-migrate --ignore-not-found
+          sed "s|__IMAGE__|$IMAGE|g" k8s/migrate-job.yaml | kubectl -n "$NAMESPACE" apply -f -
+          kubectl -n "$NAMESPACE" wait --for=condition=complete job/db-migrate --timeout=300s \
+            || { echo "== migration failed =="; kubectl -n "$NAMESPACE" logs job/db-migrate; exit 1; }
+
+      - name: Roll out new image
+        run: |
+          IMAGE="$ECR_REGISTRY/$ECR_REPOSITORY:${{ steps.tag.outputs.tag }}"
+          kubectl -n "$NAMESPACE" set image deployment/album-collector app="$IMAGE"
+          kubectl -n "$NAMESPACE" rollout status deployment/album-collector --timeout=180s

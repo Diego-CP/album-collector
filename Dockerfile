@@ -11,8 +11,16 @@ WORKDIR /app
 
 # dumb-init becomes PID 1 and forwards SIGTERM to Node. On EKS:
 # when Kubernetes stops a pod it sends SIGTERM, allowing Express to shut
-# down gracefully.
+# down gracefully
 RUN apk add --no-cache dumb-init
+
+# DB: dbmate (DB migration tool)
+# Fetched in its own stage so curl isn't in the final image. arm64 to match nodes
+FROM alpine:3 AS dbmate
+RUN apk add --no-cache curl && \
+    curl -fsSL -o /dbmate \
+      https://github.com/amacneil/dbmate/releases/latest/download/dbmate-linux-arm64 && \
+    chmod +x /dbmate
 
 # DEPENDENCIES
 
@@ -32,6 +40,9 @@ ENV PORT=3000
 COPY --from=deps --chown=node:node /app/node_modules ./node_modules
 COPY --chown=node:node . .
 
+# Used by the migration Job
+COPY --from=dbmate /dbmate /usr/local/bin/dbmate
+
 # Switch to non-root user for runtime
 USER node
 EXPOSE 3000
@@ -40,5 +51,4 @@ EXPOSE 3000
 #   CMD node -e "fetch('http://localhost:'+(process.env.PORT||3000)+'/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 
 ENTRYPOINT ["dumb-init", "--"]
-# CHANGE THIS to your real entry file if it isn't server.js.
 CMD ["node", "app.js"]
