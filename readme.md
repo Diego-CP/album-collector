@@ -3,12 +3,15 @@
 See a demo video here:
 
 Part 1:
+
 https://github.com/user-attachments/assets/31513cdd-2bb8-45c5-b03d-a4138f7a0831
 
 Part 2:
+
 https://github.com/user-attachments/assets/8c69d0dc-fd51-41ba-8e9d-348f6e4fdb5b
 
 Part 3:
+
 https://github.com/user-attachments/assets/2a48b80b-3819-4a04-aa47-5aac691bbb32
 
 ## Rationale
