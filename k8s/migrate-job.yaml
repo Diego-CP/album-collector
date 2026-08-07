@@ -1,9 +1,11 @@
 apiVersion: batch/v1
+# Job pods are ran once
 kind: Job
 metadata:
   name: db-migrate
   namespace: album-collector
 spec:
+  # Only retry once if the pod fails
   backoffLimit: 1
   ttlSecondsAfterFinished: 600 # auto-delete the finished Job after 10 min
   template:
@@ -11,7 +13,11 @@ spec:
       labels:
         job: db-migrate
     spec:
+      # Failed pods are replaced, rather than restarted
       restartPolicy: Never
+      # Prevent the default SA API token from being mounted - it's unused
+      automountServiceAccountToken: false
+      # Pod-level security
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
@@ -22,18 +28,28 @@ spec:
           # Replaced by the pipeline with the exact SHA-tagged image
           # being deployed, so migrations always match the code
           image: __IMAGE__
+          # Container-level security
+          securityContext:
+            # No process can gain more privileges than its parent
+            allowPrivilegeEscalation: false
+            # Drop all default Linux privileges
+            capabilities:
+              drop: ["ALL"]
           workingDir: /app
+          # Get the same env vars as the app, so it talks to the same DB
           envFrom:
             - configMapRef:
                 name: app-config
             - secretRef:
                 name: app-secrets # ESO-synced
           command: ["sh", "-c"]
+          # Apply any pending migrations
           args:
             - |
+              # Abort on any error
               set -e
               # URL-encode the password
               ENC_PW=$(node -e 'process.stdout.write(encodeURIComponent(process.env.DB_PASSWORD))')
               export DATABASE_URL="mysql://${DB_USER}:${ENC_PW}@${DB_HOST}:3306/${DB_NAME}"
-              # Adjust --migrations-dir to where migrations live in the image
+              # Apply pending migrations
               dbmate --url "$DATABASE_URL" --migrations-dir ./app/db/migrations --no-dump-schema up

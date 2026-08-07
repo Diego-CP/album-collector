@@ -14,6 +14,8 @@ WORKDIR /app
 # down gracefully
 RUN apk add --no-cache dumb-init
 
+# BUNDLE
+
 # DB: dbmate (DB migration tool)
 # Fetched in its own stage so curl isn't in the final image. arm64 to match nodes
 FROM alpine:3 AS dbmate

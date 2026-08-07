@@ -29,6 +29,7 @@ resource "helm_release" "eso" {
   set = [
     # Install the Custom Resource Definitions
     { name = "installCRDs", value = "true" },
+    # Create the external-secrets SA that pods will use
     { name = "serviceAccount.create", value = "true" },
     { name = "serviceAccount.name", value = "external-secrets" },
     { name = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn", value = module.eso_irsa.iam_role_arn },

@@ -12,7 +12,4 @@ resource "helm_release" "metrics_server" {
     # TODO: Enable kubelet serving-cert signing instead
     { name = "args[0]", value = "--kubelet-insecure-tls" },
   ]
-
-  # Wait for LB controller to register the webhook
-  depends_on = [helm_release.lbc]
 }

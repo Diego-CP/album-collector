@@ -3,7 +3,8 @@ resource "aws_security_group" "aurora" {
   description = "Aurora MySQL access"
   vpc_id      = data.terraform_remote_state.network.outputs.vpc_id
 
-  # TODO: Replace with EKS SG
+  # Would replace with EKS SG in prod, where the SG is not constantly
+  # torn down
   ingress {
     description = "MySQL from within the VPC"
     from_port   = 3306

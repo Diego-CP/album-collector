@@ -10,8 +10,7 @@ services:
       # Override it
       DB_HOST: db
       DATABASE_URL: mysql://${DB_USER}:${DB_PASSWORD}@db:3306/${DB_NAME}
-      # For local dev
-      NODE_ENV: dev
+      NODE_ENV: development # For local dev using HTTP
       PORT: 3000
     depends_on:
       db:
@@ -37,6 +36,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+      # Long start_period because MySQL first-run init is slow
+      # Failures during this period do not count towards the retry budget
       start_period: 30s
     restart: unless-stopped
 

@@ -20,6 +20,7 @@ locals {
   state_bucket_name = "${var.project}-tfstate-${data.aws_caller_identity.current.account_id}"
 }
 
+# Each resource is a separate API call
 resource "aws_s3_bucket" "tf_state" {
   bucket = local.state_bucket_name
   lifecycle {

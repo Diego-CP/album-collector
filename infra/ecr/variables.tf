@@ -12,7 +12,7 @@ variable "region" {
 
 variable "environment" {
   type        = string
-  default     = "dev"
+  default     = "prod"
   description = "Environment name (dev/staging/prod)."
 }
 

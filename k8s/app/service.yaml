@@ -6,11 +6,15 @@ metadata:
   labels:
     app: album-collector
 spec:
-  # TODO: Change in prod. ClusterIP: internal
+  # Service only reachable from inside the cluster
+  # It gets an internal IP
   type: ClusterIP
+  # Register all pods carrying this label
   selector:
     app: album-collector
   ports:
+    # The port the Service listens on
     - port: 80
+      # The port on the pods to forward to
       targetPort: 3000
       protocol: TCP

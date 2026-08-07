@@ -1,17 +1,20 @@
 data "aws_caller_identity" "current" {}
 
-# GitHub's OIDC identity provider
+# Fetch GitHub's OIDC certificate, for the thumbprint
 data "tls_certificate" "github" {
   url = "https://token.actions.githubusercontent.com/.well-known/openid-configuration"
 }
 
+# Set GitHub Actions as a trusted identity provider in AWS OIDC
 resource "aws_iam_openid_connect_provider" "github" {
   url             = "https://token.actions.githubusercontent.com"
+  # Expected audience for the tokens is STS
   client_id_list  = ["sts.amazonaws.com"]
+  # Thumbprint of GitHub's OIDC cert, computed from the fetched cert above
   thumbprint_list = [data.tls_certificate.github.certificates[0].sha1_fingerprint]
 }
 
-# Only GitHub and only my repo may assume this role
+# Trust policy: only GitHub, my repo, main branch may assume this role
 data "aws_iam_policy_document" "assume" {
   statement {
     actions = ["sts:AssumeRoleWithWebIdentity"]

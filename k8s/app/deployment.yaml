@@ -6,8 +6,9 @@ metadata:
   labels:
     app: album-collector
 spec:
-  # replicas omitted, as the HPA owns the replica count
+  # Replicas omitted, as the HPA owns the replica count
   selector:
+    # Deployment manages each pod carrying this label
     matchLabels:
       app: album-collector
   template:
@@ -15,31 +16,44 @@ spec:
       labels:
         app: album-collector
     spec:
+      # Pod-level security
       securityContext:
-        runAsNonRoot: true # image runs as "node" user
+        runAsNonRoot: true # refuses to start if image would run as root
         runAsUser: 1000 # numeric UID of "node" user
+        # Filter syscalls the app can make to the container runtime (containerd)
+        # curated profile
         seccompProfile:
           type: RuntimeDefault
       containers:
         - name: app
+          # Replaced with the SHA-tagged ECR image via sed in the pipeline
           image: __IMAGE__
+          # Doesn't actually open any ports, simply informational
           ports:
             - containerPort: 3000
           # Pull keys from ConfigMap and Secret as env variables
           envFrom:
+            # From configMap
             - configMapRef:
                 name: app-config
+            # From ESO
             - secretRef:
                 name: app-secrets
           resources:
+            # What the scheduler reserves/requests - what's read by HPA
             requests:
-              cpu: 100m
+              cpu: 100m # m = millicores. So 100m = 0.1 CPU cores
               memory: 128Mi
+            # Exceed CPU and Pod throttles. Exceed Mem and Pod is OOM-killed
             limits:
               cpu: 500m
               memory: 512Mi
+          # Container-level security
           securityContext:
+            # No process can gain more privileges than its parent
             allowPrivilegeEscalation: false
+            # Drop all default Linux privileges
+            # Ex: Change file ownership, system files, raw network packets
             capabilities:
               drop: ["ALL"]
           # liveness/readiness don't begin until this passes
@@ -47,10 +61,12 @@ spec:
             httpGet:
               path: /health/live
               port: 3000
+            # 150s to account for Aurora cold starts + app boot
             periodSeconds: 5
             failureThreshold: 30
           livenessProbe:
             httpGet:
+              # Does not hit DB, just the app
               path: /health/live
               port: 3000
             periodSeconds: 10
@@ -59,6 +75,7 @@ spec:
           # it is held until the DB responds
           readinessProbe:
             httpGet:
+              # Hits DB
               path: /health/ready
               port: 3000
             periodSeconds: 10

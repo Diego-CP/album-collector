@@ -35,7 +35,10 @@ resource "helm_release" "lbc" {
       name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
       value = module.lbc_irsa.iam_role_arn
     },
+
     # Controller auto-discovers subnets via the kubernetes.io/role/elb tags on them
+
+    # Controller only looks for tags in subnets associated with this cluster
     {
       name  = "clusterName"
       value = data.aws_eks_cluster.this.name

@@ -28,11 +28,10 @@ resource "aws_rds_cluster" "this" {
   }
 
   storage_encrypted       = true
-  backup_retention_period = 1
+  backup_retention_period = 7
 
-  # TODO: Flip in prod
-  skip_final_snapshot = true
-  deletion_protection = false
+  skip_final_snapshot = false
+  deletion_protection = true
 }
 
 resource "aws_rds_cluster_instance" "this" {

@@ -6,6 +6,7 @@ metadata:
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
+    # Manage the replica count of the Deployment called album-collector
     kind: Deployment
     name: album-collector
   minReplicas: 2

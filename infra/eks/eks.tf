@@ -5,8 +5,14 @@ module "eks" {
   name               = "${var.project}-eks"
   kubernetes_version = var.kubernetes_version
 
-  # TODO: Replace with
-  # endpoint_public_access_cidrs = ["<my IP>/32"]
+  # Control-plane logging to CloudWatch
+  # EKS will auto-create a Log Group on the first logging-enabled apply
+  # That group lives outside TF, so it will survive rebuilds
+  enabled_log_types = ["audit", "authenticator"]
+  # We don't want Terraform to create the Log Gruop
+  create_cloudwatch_log_group = false
+
+  # Public endpoint, auth-gated. CI (GitHub-hosted runners) needs API access
   endpoint_public_access = true
 
   # Adds the identity running Terraform (the SSO role) as a cluster admin via an
@@ -46,7 +52,9 @@ module "eks" {
         }
       })
     }
-    eks-pod-identity-agent = { before_compute = true }
+
+    # IRSA is used instead of the Pod Identity Agent
+    # eks-pod-identity-agent = { before_compute = true }
   }
 
   vpc_id     = data.terraform_remote_state.network.outputs.vpc_id

@@ -5,6 +5,7 @@ module "cluster_autoscaler_irsa" {
 
   role_name                        = "${var.project}-cluster-autoscaler"
   attach_cluster_autoscaler_policy = true
+  # Scope to just the ASGs tagged for this cluster
   cluster_autoscaler_cluster_names = [data.terraform_remote_state.eks.outputs.cluster_name]
 
   oidc_providers = {
@@ -30,10 +31,7 @@ resource "helm_release" "cluster_autoscaler" {
     { name = "rbac.serviceAccount.name", value = "cluster-autoscaler" },
     { name = "rbac.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn", value = module.cluster_autoscaler_irsa.iam_role_arn },
 
-    # Match cluster's version
+    # Must match cluster's version
     { name = "image.tag", value = "v1.33.6" },
   ]
-
-  # Wait for LB controller to register the webhook
-  depends_on = [helm_release.lbc]
 }
